@@ -49,12 +49,12 @@ WhatsApp AI Agent per zerox.technology. Bot che risponde a messaggi di testo, vo
 - **Node.js 20** + **TypeScript** (eseguito con tsx, no build step)
 - **Express 4** — web server con helmet, CORS, rate limiting
 - **better-sqlite3** — database locale (WAL mode, indici su phone+timestamp)
-- **@anthropic-ai/sdk** + **openai** — provider LLM switchabili (singleton client)
+- **@anthropic-ai/sdk** + **openai** + **@google/generative-ai** — 3 provider LLM switchabili (singleton client)
 - **Evolution API** — bridge WhatsApp (Docker)
 - **nodemailer** — notifiche email SMTP
 - **bcrypt** + **jsonwebtoken** — auth pannello admin
 - **pino** — structured logging
-- **Vitest** — testing framework (44 test)
+- **Vitest** — testing framework (46 test)
 - **ESLint** + **Prettier** — linting e formattazione
 
 ## Comandi
@@ -97,7 +97,8 @@ whatsapp-agent/
 │   ├── llm/
 │   │   ├── router.ts           # Sceglie provider in base a config DB
 │   │   ├── claude.ts           # Anthropic SDK: singleton client, error handling
-│   │   └── openai.ts           # OpenAI SDK: singleton client, error handling
+│   │   ├── openai.ts           # OpenAI SDK: singleton client, error handling
+│   │   └── gemini.ts           # Google Gemini SDK: singleton client, error handling
 │   │
 │   ├── media/
 │   │   ├── voice.ts            # Audio → Whisper API → testo (con error handling)
@@ -131,7 +132,7 @@ whatsapp-agent/
 │   ├── database.test.ts        # 17 test: CRUD, paginazione, stats, search
 │   ├── auth.test.ts            # 11 test: bcrypt, JWT sign/verify
 │   ├── handoff.test.ts         # 9 test: keyword detection, edge cases
-│   └── llm-router.test.ts     # 7 test: routing provider, errori
+│   └── llm-router.test.ts     # 9 test: routing provider (Claude/OpenAI/Gemini), errori
 │
 ├── data/
 │   └── agent.db                # SQLite database (auto-creato)
@@ -169,7 +170,7 @@ whatsapp-agent/
 3. Se vocale → Whisper, se immagine → Vision API
 4. Controlla keyword handoff → se match, email + risposta fissa
 5. Recupera storico da SQLite
-6. Chiama LLM (Claude o OpenAI da config, singleton client)
+6. Chiama LLM (Claude, OpenAI o Gemini da config, singleton client)
 7. Salva in DB, rispondi via Evolution API
 
 ### Sicurezza

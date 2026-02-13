@@ -5,14 +5,14 @@
 
 ## Stato: Completo
 
-Il progetto è completo e funzionante. TypeScript compila senza errori, 44 test passano, 0 errori ESLint.
+Il progetto è completo e funzionante. TypeScript compila senza errori, 46 test passano, 0 errori ESLint.
 
 ### Fase 1: Implementazione base (completata)
 - Server Express con webhook, pannello admin, LLM integration
 - Database SQLite con WAL mode
 - Supporto testo, vocale (Whisper), immagini (Vision API)
 - Handoff a umano con notifica email
-- Switch Claude/OpenAI senza restart
+- Switch Claude/OpenAI/Gemini senza restart
 
 ### Fase 2: Configurazione Claude Code (completata)
 - `CLAUDE.md` con istruzioni progetto
@@ -29,6 +29,7 @@ Il progetto è completo e funzionante. TypeScript compila senza errori, 44 test 
 2. **Code quality**: types.ts, logger.ts (pino), singleton LLM client, error handling, indici DB
 3. **Testing**: Vitest, 44 test (database 17, auth 11, handoff 9, LLM router 7)
 4. **DevOps**: paginazione API, health check, GitHub Actions CI, ESLint + Prettier
+5. **Gemini**: src/llm/gemini.ts, router, image vision, admin panel UI, 2 nuovi test
 
 Pulizia aggiuntiva:
 - Logging consistente con pino (no console.log nel codice applicativo)
@@ -37,9 +38,19 @@ Pulizia aggiuntiva:
 - Documentazione aggiornata e coerente
 - Dead code rimosso (interfacce e alias inutilizzati)
 
+### Fase 5: Google Gemini Support (completata)
+- Aggiunto `@google/generative-ai` SDK
+- Nuovo file `src/llm/gemini.ts` con singleton client pattern
+- Router LLM aggiornato con routing a Gemini
+- Supporto Gemini Vision per descrizione immagini
+- Pannello admin aggiornato con provider Gemini e campo API key
+- Modelli disponibili: Gemini 2.0 Flash, 2.0 Flash Lite, 1.5 Pro, 1.5 Flash
+- 2 nuovi test per Gemini (routing + error propagation)
+- Helmet CSP configurato per permettere inline scripts nel pannello admin
+
 ## Verifiche
 - `npx tsc --noEmit` — 0 errori
-- `npx vitest run` — 44/44 test passati
+- `npx vitest run` — 46/46 test passati
 - `npx eslint src/` — 0 errori
 
 ## Prossimi passi possibili

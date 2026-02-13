@@ -56,7 +56,7 @@ Compila **obbligatoriamente**:
 - `JWT_SECRET`: stringa casuale lunga almeno 32 caratteri (es. `openssl rand -hex 32`)
 - `EVOLUTION_API_KEY`: chiave per Evolution API
 - `EVOLUTION_INSTANCE`: nome istanza (es. `zerox`)
-- `CLAUDE_API_KEY` e/o `OPENAI_API_KEY`: chiavi LLM
+- `CLAUDE_API_KEY` e/o `OPENAI_API_KEY` e/o `GEMINI_API_KEY`: chiavi LLM
 
 Opzionali:
 - `SMTP_*`: configurazione email per notifiche handoff
@@ -75,7 +75,7 @@ docker compose logs -f evolution-api
 
 ## 7. Crea istanza WhatsApp
 
-Apri `http://<ip-vps>:8080` nel browser e:
+Apri `http://<ip-vps>:8081` nel browser e:
 
 1. Crea una nuova istanza con nome = `EVOLUTION_INSTANCE` dal .env
 2. Configura il webhook: `http://localhost:3000/webhook`
@@ -185,7 +185,7 @@ pm2 restart whatsapp-agent  # o: sudo systemctl restart whatsapp-agent
 |----------|----------|
 | Server non si avvia | Controlla che `JWT_SECRET` in `.env` sia impostato (min 32 caratteri) |
 | Evolution API non parte | `docker compose logs evolution-api` |
-| QR code non appare | Verifica che la porta 8080 sia accessibile |
+| QR code non appare | Verifica che la porta 8081 sia accessibile |
 | Bot non risponde | Controlla che il webhook sia configurato in Evolution API |
 | Email handoff non arriva | Verifica config SMTP nelle impostazioni admin |
 | Errore API key | Controlla che la chiave sia inserita nelle impostazioni o nel `.env` |

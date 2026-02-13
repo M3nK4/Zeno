@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 import OpenAI from 'openai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { getApiKey, getConfig } from '../database/settings.js';
 import { logger } from '../logger.js';
 import { isSupportedImageType } from '../types.js';
@@ -10,6 +11,8 @@ export async function describeImage(imageBuffer: Buffer, mimeType: string): Prom
 
   if (provider === 'claude') {
     return describeWithClaude(imageBuffer, mimeType);
+  } else if (provider === 'gemini') {
+    return describeWithGemini(imageBuffer, mimeType);
   } else {
     return describeWithOpenai(imageBuffer, mimeType);
   }
@@ -48,6 +51,27 @@ async function describeWithClaude(imageBuffer: Buffer, mimeType: string): Promis
   } catch (err) {
     logger.error({ err, provider: 'claude' }, 'Image description failed');
     throw new Error(`Claude Vision error: ${err instanceof Error ? err.message : String(err)}`);
+  }
+}
+
+async function describeWithGemini(imageBuffer: Buffer, mimeType: string): Promise<string> {
+  const apiKey = getApiKey('gemini');
+  if (!apiKey) throw new Error('Gemini API key required for image description');
+
+  try {
+    const client = new GoogleGenerativeAI(apiKey);
+    const model = client.getGenerativeModel({ model: getConfig('llm_model') || 'gemini-2.0-flash' });
+    const base64 = imageBuffer.toString('base64');
+
+    const result = await model.generateContent([
+      { inlineData: { mimeType, data: base64 } },
+      { text: 'Descrivi brevemente questa immagine in italiano, in una o due frasi.' },
+    ]);
+
+    return result.response.text() || 'Immagine non descrivibile';
+  } catch (err) {
+    logger.error({ err, provider: 'gemini' }, 'Image description failed');
+    throw new Error(`Gemini Vision error: ${err instanceof Error ? err.message : String(err)}`);
   }
 }
 

@@ -1,13 +1,13 @@
 # WhatsApp AI Agent — zerox.technology
 
-Agente WhatsApp intelligente per zerox.technology. Risponde a messaggi di testo, vocali e immagini usando Claude o OpenAI, con memoria delle conversazioni e pannello admin web.
+Agente WhatsApp intelligente per zerox.technology. Risponde a messaggi di testo, vocali e immagini usando Claude, OpenAI o Gemini, con memoria delle conversazioni e pannello admin web.
 
 ## Requisiti
 
 - Node.js 20+ (vedi `.nvmrc`)
 - Docker + Docker Compose (per Evolution API)
 - Account WhatsApp (da collegare via QR code)
-- API key Claude e/o OpenAI
+- API key Claude, OpenAI e/o Gemini
 
 ## Quick Start
 
@@ -39,7 +39,7 @@ npm run dev
 ## Configurazione Evolution API
 
 1. Avvia con `docker compose up -d`
-2. Vai su `http://localhost:8080` (Evolution API Manager)
+2. Vai su `http://localhost:8081` (Evolution API Manager)
 3. Crea un'istanza con il nome configurato in `.env` (`EVOLUTION_INSTANCE`)
 4. Scansiona il QR code con WhatsApp
 5. Configura il webhook: `http://host:3000/webhook`
@@ -73,12 +73,12 @@ Accessibile su `http://localhost:3000/admin`:
 - Trascrive messaggi vocali (Whisper) e risponde
 - Analizza immagini (Vision API) e risponde
 - Handoff a umano con notifica email
-- Switch Claude / OpenAI senza restart
+- Switch Claude / OpenAI / Gemini senza restart
 - Pannello admin protetto da login
 - **Security**: helmet headers, rate limiting, CORS, validazione input
 - **Health check**: `GET /health` per monitoraggio
 - **Logging strutturato**: pino con output formattato
-- **44 test automatizzati** con Vitest
+- **46 test automatizzati** con Vitest
 
 ## Sicurezza
 

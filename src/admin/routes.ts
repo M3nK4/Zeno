@@ -36,7 +36,7 @@ adminRoutes.get('/settings', (_req, res) => {
     const config = getAllConfig();
     // Mask sensitive keys
     const masked = { ...config };
-    for (const key of ['claude_api_key', 'openai_api_key', 'smtp_pass']) {
+    for (const key of ['claude_api_key', 'openai_api_key', 'gemini_api_key', 'smtp_pass']) {
       if (masked[key]) {
         masked[key] = masked[key].slice(0, 8) + '••••••••';
       }
@@ -51,7 +51,7 @@ adminRoutes.post('/settings', (req, res) => {
   try {
     const updates = req.body as Record<string, string>;
     const allowedKeys = [
-      'llm_provider', 'llm_model', 'claude_api_key', 'openai_api_key',
+      'llm_provider', 'llm_model', 'claude_api_key', 'openai_api_key', 'gemini_api_key',
       'system_prompt', 'handoff_email', 'handoff_keywords',
       'smtp_host', 'smtp_port', 'smtp_user', 'smtp_pass', 'max_history',
     ];

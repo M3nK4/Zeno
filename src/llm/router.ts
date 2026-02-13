@@ -1,5 +1,6 @@
 import { callClaude } from './claude.js';
 import { callOpenai } from './openai.js';
+import { callGemini } from './gemini.js';
 import type { LlmRequest } from '../types.js';
 
 export type { LlmRequest } from '../types.js';
@@ -10,6 +11,8 @@ export async function routeLlm(request: LlmRequest): Promise<string> {
       return callClaude(request);
     case 'openai':
       return callOpenai(request);
+    case 'gemini':
+      return callGemini(request);
     default:
       throw new Error(`Unknown LLM provider: ${request.provider}`);
   }

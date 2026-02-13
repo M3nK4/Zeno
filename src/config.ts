@@ -11,6 +11,7 @@ export const env = {
 
   claudeApiKey: process.env.CLAUDE_API_KEY || '',
   openaiApiKey: process.env.OPENAI_API_KEY || '',
+  geminiApiKey: process.env.GEMINI_API_KEY || '',
 
   smtpHost: process.env.SMTP_HOST || '',
   smtpPort: parseInt(process.env.SMTP_PORT || '587', 10),

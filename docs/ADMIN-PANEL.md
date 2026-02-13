@@ -22,10 +22,11 @@
 
 | Campo | Descrizione |
 |-------|-------------|
-| Provider | Claude o OpenAI (dropdown) |
+| Provider | Claude, OpenAI o Gemini (dropdown) |
 | Modello | Lista modelli del provider selezionato |
 | API Key Claude | Chiave Anthropic (mascherata) |
 | API Key OpenAI | Chiave OpenAI (mascherata) |
+| API Key Gemini | Chiave Google AI (mascherata) |
 | System Prompt | Textarea con le istruzioni per l'agente |
 | Max storico | Numero messaggi di contesto (5-200) |
 | Email handoff | Destinatario notifiche escalation |

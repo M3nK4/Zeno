@@ -4,6 +4,7 @@ import type { LlmRequest } from '../src/types.js';
 // Mock the LLM providers
 const mockCallClaude = vi.fn();
 const mockCallOpenai = vi.fn();
+const mockCallGemini = vi.fn();
 
 vi.mock('../src/llm/claude.js', () => ({
   callClaude: (...args: unknown[]) => mockCallClaude(...args),
@@ -11,6 +12,10 @@ vi.mock('../src/llm/claude.js', () => ({
 
 vi.mock('../src/llm/openai.js', () => ({
   callOpenai: (...args: unknown[]) => mockCallOpenai(...args),
+}));
+
+vi.mock('../src/llm/gemini.js', () => ({
+  callGemini: (...args: unknown[]) => mockCallGemini(...args),
 }));
 
 import { routeLlm } from '../src/llm/router.js';
@@ -70,10 +75,31 @@ describe('LLM Router', () => {
     });
   });
 
+  describe('routing to Gemini', () => {
+    it('calls callGemini when provider is "gemini"', async () => {
+      mockCallGemini.mockResolvedValue('Ciao! Sono Gemini.');
+
+      const request = createRequest('gemini');
+      const result = await routeLlm(request);
+
+      expect(result).toBe('Ciao! Sono Gemini.');
+      expect(mockCallGemini).toHaveBeenCalledWith(request);
+      expect(mockCallClaude).not.toHaveBeenCalled();
+      expect(mockCallOpenai).not.toHaveBeenCalled();
+    });
+
+    it('propagates errors from Gemini provider', async () => {
+      mockCallGemini.mockRejectedValue(new Error('Gemini API error: quota exceeded'));
+
+      const request = createRequest('gemini');
+      await expect(routeLlm(request)).rejects.toThrow('Gemini API error: quota exceeded');
+    });
+  });
+
   describe('unknown provider', () => {
     it('throws error for unknown provider', async () => {
-      const request = createRequest('gemini');
-      await expect(routeLlm(request)).rejects.toThrow('Unknown LLM provider: gemini');
+      const request = createRequest('mistral');
+      await expect(routeLlm(request)).rejects.toThrow('Unknown LLM provider: mistral');
     });
 
     it('throws error for empty provider', async () => {

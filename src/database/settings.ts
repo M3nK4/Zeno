@@ -40,6 +40,9 @@ export function getApiKey(provider: string): string {
   if (provider === 'openai') {
     return getConfig('openai_api_key') || env.openaiApiKey;
   }
+  if (provider === 'gemini') {
+    return getConfig('gemini_api_key') || env.geminiApiKey;
+  }
   return '';
 }
 

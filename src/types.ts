@@ -2,7 +2,7 @@
 
 // --- LLM Types ---
 
-export type LlmProvider = 'claude' | 'openai';
+export type LlmProvider = 'claude' | 'openai' | 'gemini';
 
 export interface LlmMessage {
   readonly role: 'user' | 'assistant';

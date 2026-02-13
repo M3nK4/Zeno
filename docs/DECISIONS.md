@@ -22,7 +22,7 @@ Scelte architetturali e punti aperti per lo sviluppo e il deploy.
 
 ### Testing (implementato)
 - Framework: Vitest
-- 44 test unitari: database, auth, handoff, LLM routing
+- 46 test unitari: database, auth, handoff, LLM routing (incl. Gemini)
 - CI con GitHub Actions: type check + test
 
 ### Paginazione API (implementato)
@@ -35,6 +35,14 @@ Scelte architetturali e punti aperti per lo sviluppo e il deploy.
 - Chiude correttamente il database SQLite prima dell'uscita
 - Timeout forzato di 10 secondi se la chiusura non riesce
 - Compatibile con PM2, Docker e systemd
+
+### Google Gemini Support (implementato)
+- Terzo provider LLM: Google Gemini via `@google/generative-ai`
+- Modelli supportati: Gemini 2.0 Flash, 2.0 Flash Lite, 1.5 Pro, 1.5 Flash
+- Singleton client pattern (come Claude e OpenAI)
+- Supporto Vision per descrizione immagini con `inlineData`
+- Pannello admin aggiornato con dropdown Gemini e campo API key
+- Helmet CSP configurato con `'unsafe-inline'` per script-src e script-src-attr (necessario per inline event handlers del pannello admin)
 
 ## Punti aperti
 

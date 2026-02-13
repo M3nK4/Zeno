@@ -5,7 +5,7 @@
 ```
 Utente WhatsApp
       |
-Evolution API (Docker, porta 8080)
+Evolution API (Docker, porta 8081)
       | webhook POST
 Node.js Server (Express, porta 3000)
       |
@@ -29,6 +29,7 @@ Node.js Server (Express, porta 3000)
    LLM Router
       +-- Claude (Anthropic SDK, singleton client)
       +-- OpenAI (OpenAI SDK, singleton client)
+      +-- Gemini (Google Generative AI SDK, singleton client)
       |
    SQLite Database (WAL mode)
       +-- messages (storico conversazioni, indicizzato)
@@ -49,11 +50,11 @@ Node.js Server (Express, porta 3000)
 2. **handler.ts** valida il body (struttura, event, formato telefono)
 3. Estrae tipo (testo/vocale/immagine), numero telefono, contenuto
 4. Se vocale: scarica audio -> Whisper API -> trascrizione
-5. Se immagine: scarica -> Vision API (Claude o OpenAI) -> descrizione
+5. Se immagine: scarica -> Vision API (Claude, OpenAI o Gemini) -> descrizione
 6. Controlla keyword handoff -> se match, invia email e risposta fissa
 7. Recupera storico conversazione da SQLite (ultimi N messaggi)
 8. Costruisce array messaggi: [system prompt, storico, nuovo messaggio]
-9. Chiama LLM (Claude o OpenAI in base a config, singleton client)
+9. Chiama LLM (Claude, OpenAI o Gemini in base a config, singleton client)
 10. Salva messaggi utente + risposta in SQLite
 11. Invia risposta via Evolution API
 
@@ -89,11 +90,12 @@ SQLite locale (`data/agent.db`), creato automaticamente al primo avvio.
 | `src/config.ts` | Caricamento `.env` + validazione sicurezza all'avvio |
 | `src/server.ts` | Bootstrap Express: helmet, CORS, rate limiting, routes, health check |
 | `src/webhook/handler.ts` | Gestione messaggi: validazione, routing per tipo, chiamata LLM |
-| `src/llm/router.ts` | Routing Claude/OpenAI in base a config |
+| `src/llm/router.ts` | Routing Claude/OpenAI/Gemini in base a config |
 | `src/llm/claude.ts` | Client Anthropic (singleton, error handling, logging) |
 | `src/llm/openai.ts` | Client OpenAI (singleton, error handling, logging) |
+| `src/llm/gemini.ts` | Client Google Gemini (singleton, error handling, logging) |
 | `src/media/voice.ts` | Trascrizione audio con Whisper |
-| `src/media/image.ts` | Descrizione immagini con Vision API (Claude/OpenAI) |
+| `src/media/image.ts` | Descrizione immagini con Vision API (Claude/OpenAI/Gemini) |
 | `src/database/setup.ts` | Schema SQLite, init tabelle, indici, config default |
 | `src/database/conversations.ts` | CRUD messaggi, storico, paginazione, statistiche |
 | `src/database/settings.ts` | CRUD config, helper API key e SMTP |
@@ -107,12 +109,12 @@ SQLite locale (`data/agent.db`), creato automaticamente al primo avvio.
 - **Runtime**: Node.js 20 + TypeScript strict (eseguito con tsx)
 - **Web framework**: Express 4 + helmet + cors + express-rate-limit
 - **Database**: better-sqlite3 (WAL mode, foreign keys, indici)
-- **LLM**: @anthropic-ai/sdk, openai (singleton client per provider)
+- **LLM**: @anthropic-ai/sdk, openai, @google/generative-ai (singleton client per provider)
 - **Auth**: bcrypt (10 rounds) + jsonwebtoken (24h)
 - **Email**: nodemailer
 - **HTTP client**: axios (30s timeout)
 - **WhatsApp**: Evolution API (Docker)
 - **Logging**: pino + pino-pretty
-- **Testing**: Vitest + @vitest/coverage-v8 (44 test)
+- **Testing**: Vitest + @vitest/coverage-v8 (46 test)
 - **Linting**: ESLint (typescript-eslint strict) + Prettier
 - **CI**: GitHub Actions (type check + test)
