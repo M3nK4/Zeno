@@ -1,4 +1,4 @@
-# Deploy su VPS Namecheap
+# Deploy su VPS
 
 ## 1. Prerequisiti
 
@@ -32,7 +32,7 @@ curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt install -y nodejs
 
 # Verifica
-node --version
+node --version  # v20.x.x
 npm --version
 ```
 
@@ -52,12 +52,17 @@ cp .env.example .env
 nano .env
 ```
 
-Compila:
-- `JWT_SECRET`: stringa casuale lunga (es. `openssl rand -hex 32`)
+Compila **obbligatoriamente**:
+- `JWT_SECRET`: stringa casuale lunga almeno 32 caratteri (es. `openssl rand -hex 32`)
 - `EVOLUTION_API_KEY`: chiave per Evolution API
 - `EVOLUTION_INSTANCE`: nome istanza (es. `zerox`)
 - `CLAUDE_API_KEY` e/o `OPENAI_API_KEY`: chiavi LLM
+
+Opzionali:
 - `SMTP_*`: configurazione email per notifiche handoff
+- `CORS_ORIGIN`: origini consentite (default: `*`)
+
+**IMPORTANTE**: `JWT_SECRET` deve essere una stringa unica e forte. Il server non si avvia se usa il valore di default.
 
 ## 6. Avvia Evolution API
 
@@ -86,7 +91,7 @@ npm run create-admin -- mio-user mia-password
 
 ## 9. Avvia il server
 
-### Opzione A: con pm2 (consigliato)
+### Opzione A: con PM2 (consigliato)
 
 ```bash
 # Installa pm2
@@ -105,7 +110,7 @@ pm2 save
 ```bash
 sudo tee /etc/systemd/system/whatsapp-agent.service << 'EOF'
 [Unit]
-Description=WhatsApp AI Agent
+Description=WhatsApp AI Agent — zerox.technology
 After=network.target
 
 [Service]
@@ -157,11 +162,12 @@ sudo certbot --nginx -d agent.zerox.technology
 
 ## 11. Verifica
 
-1. Apri `http://<ip-vps>:3000/admin` (o il dominio HTTPS)
-2. Login con le credenziali create
-3. Configura LLM e system prompt dalle impostazioni
-4. Invia un messaggio WhatsApp al numero collegato
-5. Verifica che l'agente risponda
+1. Controlla il health check: `curl http://localhost:3000/health`
+2. Apri `http://<ip-vps>:3000/admin` (o il dominio HTTPS)
+3. Login con le credenziali create
+4. Configura LLM e system prompt dalle impostazioni
+5. Invia un messaggio WhatsApp al numero collegato
+6. Verifica che l'agente risponda
 
 ## Aggiornamento
 
@@ -169,13 +175,18 @@ sudo certbot --nginx -d agent.zerox.technology
 cd /opt/whatsapp-agent
 git pull
 npm install
+npm test                  # Verifica che i test passino
 pm2 restart whatsapp-agent  # o: sudo systemctl restart whatsapp-agent
 ```
 
 ## Troubleshooting
 
-- **Evolution API non parte**: `docker compose logs evolution-api`
-- **QR code non appare**: verifica che la porta 8080 sia accessibile
-- **Bot non risponde**: controlla che il webhook sia configurato correttamente in Evolution API
-- **Email handoff non arriva**: verifica config SMTP nelle impostazioni admin
-- **Errore API key**: controlla che la chiave sia inserita nelle impostazioni o nel .env
+| Problema | Soluzione |
+|----------|----------|
+| Server non si avvia | Controlla che `JWT_SECRET` in `.env` sia impostato (min 32 caratteri) |
+| Evolution API non parte | `docker compose logs evolution-api` |
+| QR code non appare | Verifica che la porta 8080 sia accessibile |
+| Bot non risponde | Controlla che il webhook sia configurato in Evolution API |
+| Email handoff non arriva | Verifica config SMTP nelle impostazioni admin |
+| Errore API key | Controlla che la chiave sia inserita nelle impostazioni o nel `.env` |
+| Rate limit raggiunto | Attendi il reset (1 min globale, 15 min login) |

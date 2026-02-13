@@ -4,7 +4,7 @@ Agente WhatsApp intelligente per zerox.technology. Risponde a messaggi di testo,
 
 ## Requisiti
 
-- Node.js 18+
+- Node.js 20+ (vedi `.nvmrc`)
 - Docker + Docker Compose (per Evolution API)
 - Account WhatsApp (da collegare via QR code)
 - API key Claude e/o OpenAI
@@ -21,7 +21,7 @@ npm install
 
 # 3. Configura
 cp .env.example .env
-# Modifica .env con le tue credenziali
+# Modifica .env con le tue credenziali (JWT_SECRET obbligatorio!)
 
 # 4. Avvia Evolution API
 docker compose up -d
@@ -51,7 +51,13 @@ npm run dev
 | `npm run dev` | Avvia in modalità sviluppo (auto-reload) |
 | `npm start` | Avvia in produzione |
 | `npm run create-admin` | Crea/aggiorna utente admin |
-| `npm run create-admin <user> <pass>` | Crea con credenziali specifiche |
+| `npm run create-admin -- <user> <pass>` | Crea con credenziali specifiche |
+| `npm test` | Esegue la test suite (Vitest) |
+| `npm run test:watch` | Test in watch mode |
+| `npm run test:coverage` | Test con coverage report |
+| `npm run lint` | Controlla codice con ESLint |
+| `npm run lint:fix` | Fix automatico ESLint |
+| `npm run format` | Formatta codice con Prettier |
 
 ## Pannello Admin
 
@@ -59,7 +65,7 @@ Accessibile su `http://localhost:3000/admin`:
 
 - **Dashboard**: statistiche, stato Evolution API, conversazioni recenti
 - **Impostazioni**: provider LLM, API key, system prompt, handoff, SMTP
-- **Conversazioni**: storico completo, ricerca, vista chat
+- **Conversazioni**: storico completo con paginazione, ricerca full-text, vista chat
 
 ## Funzionalita
 
@@ -69,6 +75,20 @@ Accessibile su `http://localhost:3000/admin`:
 - Handoff a umano con notifica email
 - Switch Claude / OpenAI senza restart
 - Pannello admin protetto da login
+- **Security**: helmet headers, rate limiting, CORS, validazione input
+- **Health check**: `GET /health` per monitoraggio
+- **Logging strutturato**: pino con output formattato
+- **44 test automatizzati** con Vitest
+
+## Sicurezza
+
+- `helmet` per security headers HTTP
+- Rate limiting su tutti gli endpoint (globale, webhook, login)
+- CORS configurabile via `CORS_ORIGIN` in `.env`
+- Validazione `JWT_SECRET` all'avvio (blocca se usa default insicuro)
+- Validazione input sul webhook (body, event, formato telefono)
+- API key mascherate nelle risposte admin
+- Password hashate con bcrypt (10 rounds)
 
 ## Licenza
 

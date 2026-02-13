@@ -3,62 +3,41 @@
 ## Posizione
 `C:\Users\Alessio\Desktop\whatsapp-agent\`
 
-## Cosa è stato fatto
+## Stato: Fase 4 completata
 
-### Fase 1: Progetto creato (COMPLETO)
-Tutti i file sorgente implementati e funzionanti (`npx tsc --noEmit` passa):
-- `package.json`, `tsconfig.json`, `.env.example`, `docker-compose.yml`, `.gitignore`
-- `src/server.ts` — Express server porta 3000
-- `src/config.ts` — env loader
-- `src/webhook/handler.ts` — riceve messaggi Evolution API, smista testo/vocale/immagine
-- `src/llm/router.ts` + `claude.ts` + `openai.ts` — LLM switchabile
-- `src/media/voice.ts` — Whisper transcription
-- `src/media/image.ts` — Vision API (Claude/OpenAI)
-- `src/database/setup.ts` + `conversations.ts` + `settings.ts` — SQLite
-- `src/evolution/client.ts` — wrapper Evolution API
-- `src/handoff/notify.ts` — keyword detection + email
-- `src/admin/auth.ts` + `routes.ts` + `create-user.ts` — JWT auth + API REST
-- `src/admin/public/` — 4 pagine HTML (login, dashboard, settings, conversations) + CSS + JS
-- `docs/` — README, ARCHITECTURE, ADMIN-PANEL, SETUP-VPS, DECISIONS
-- Dipendenze installate (`npm install` completato, 241 packages)
+Il progetto e completo e funzionante. TypeScript compila senza errori, 44 test passano.
 
-### Fase 2: Claude Code config (COMPLETO)
-- `CLAUDE.md` creato alla root del progetto
-- `.claude/settings.json` con permessi + CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
-- `.claude/skills/` creata
+### Fase 1: Implementazione base (completata)
+- Server Express con webhook, pannello admin, LLM integration
+- Database SQLite con WAL mode
+- Supporto testo, vocale (Whisper), immagini (Vision API)
+- Handoff a umano con notifica email
+- Switch Claude/OpenAI senza restart
 
-### Fase 3: Skills installate (COMPLETO)
-15 skill copiate in `.claude/skills/`, tutte con SKILL.md verificato:
+### Fase 2: Configurazione Claude Code (completata)
+- `CLAUDE.md` con istruzioni progetto
+- `.claude/settings.json` con permessi
+- `.claude/skills/` con 15 skill installate
 
-**Sicurezza (6):**
-- `security-review` (dstiliadis) — gate obbligatorio, 80+ item checklist
-- `secure-code-guardian` (Jeffallan) — scrittura codice sicuro
-- `security-reviewer` (Jeffallan) — SAST code review
-- `insecure-defaults` (Trail of Bits) — default insicuri, secret hardcoded
-- `security-analyzer` (Svenja) — OWASP Top 10
-- `sharp-edges` (Trail of Bits) — API pericolose, footgun
+### Fase 3: Skills installate (completata)
+15 skill in 4 categorie: sicurezza (6), code quality (4), architettura (3), LLM/testing (2).
 
-**Code Quality (4):**
-- `code-reviewer` (Jeffallan) — review strutturata
-- `code-quality-gate` (Svenja) — pipeline 5 stadi
-- `strict-typescript-mode` (Svenja) — type safety enforcement
-- `typescript-pro` (Jeffallan) — tipi avanzati
+### Fase 4: Miglioramento con Agent Teams (completata)
+4 agent teams hanno lavorato in parallelo usando le skill:
 
-**Architettura & Produzione (3):**
-- `api-designer` (Jeffallan) — RESTful, OpenAPI
-- `monitoring-expert` (Jeffallan) — logging, metriche
-- `devops-engineer` (Jeffallan) — CI/CD
+1. **Security hardening**: helmet, rate limiting, CORS, validazione input, validateConfig()
+2. **Code quality**: types.ts, logger.ts, singleton LLM client, error handling, indici DB
+3. **Testing**: Vitest, 44 test (database, auth, handoff, LLM router)
+4. **DevOps**: paginazione API, health check, GitHub Actions CI, ESLint + Prettier
 
-**LLM & Testing (2):**
-- `prompt-engineer` (Jeffallan) — design prompt
-- `test-master` (Jeffallan) — testing strategy
+## Verifiche
+- `npx tsc --noEmit` — 0 errori
+- `npx vitest run` — 44/44 test passati
+- Documentazione aggiornata e coerente
 
-## Prossimo passo
-USARE LE SKILL per migliorare la qualità del progetto whatsapp-agent.
-L'utente ha confermato di voler procedere con il miglioramento.
-
-## Fonti skill
-- https://github.com/dstiliadis/security-review-skill
-- https://github.com/Jeffallan/claude-skills
-- https://github.com/trailofbits/skills
-- https://github.com/Svenja-dev/claude-code-skills
+## Prossimi passi possibili
+- Deploy su VPS con PM2
+- Personalizzare system prompt per zerox.technology
+- Aggiungere graceful shutdown (SIGTERM/SIGINT)
+- Monitoring con Prometheus/Grafana
+- Test E2E

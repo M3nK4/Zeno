@@ -1,7 +1,6 @@
 import { getDb } from './setup.js';
 import type { DbMessage, ConversationSummary, DbStats, CountRow, PaginatedResult } from '../types.js';
 
-// Re-export for backward compatibility
 export type Message = DbMessage;
 
 export function saveMessage(

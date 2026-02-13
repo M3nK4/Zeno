@@ -2,7 +2,6 @@ import { callClaude } from './claude.js';
 import { callOpenai } from './openai.js';
 import type { LlmRequest } from '../types.js';
 
-// Re-export for backward compatibility with webhook/handler.ts
 export type { LlmRequest } from '../types.js';
 
 export async function routeLlm(request: LlmRequest): Promise<string> {
