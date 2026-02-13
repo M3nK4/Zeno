@@ -1,8 +1,6 @@
 import { getDb } from './setup.js';
 import type { DbMessage, ConversationSummary, DbStats, CountRow, PaginatedResult } from '../types.js';
 
-export type Message = DbMessage;
-
 export function saveMessage(
   phone: string,
   role: 'user' | 'assistant',

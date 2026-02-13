@@ -17,10 +17,6 @@ export interface LlmRequest {
   readonly messages: readonly LlmMessage[];
 }
 
-export interface LlmResponse {
-  readonly text: string;
-}
-
 // --- Database Types ---
 
 export interface DbMessage {

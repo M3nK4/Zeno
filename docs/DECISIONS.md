@@ -30,6 +30,12 @@ Scelte architetturali e punti aperti per lo sviluppo e il deploy.
 - Parametri: `page` (default 1), `limit` (default 20, max 100)
 - Risposta include metadata di paginazione
 
+### Graceful Shutdown (implementato)
+- Handler SIGTERM e SIGINT in `server.ts`
+- Chiude correttamente il database SQLite prima dell'uscita
+- Timeout forzato di 10 secondi se la chiusura non riesce
+- Compatibile con PM2, Docker e systemd
+
 ## Punti aperti
 
 ### 1. System Prompt
@@ -70,12 +76,7 @@ Il prompt di sistema attuale e generico. Da personalizzare con:
 - Futuro: profili diversi per diversi numeri WhatsApp
 - Futuro: routing basato su lingua o tipo di richiesta
 
-### 8. Graceful Shutdown
-- Attualmente manca un handler SIGTERM/SIGINT
-- Necessario per chiudere correttamente il database SQLite
-- Importante per deploy con PM2 o container Docker
-
-### 9. Monitoring in produzione
+### 8. Monitoring in produzione
 - Aggiungere metriche Prometheus per:
   - Messaggi processati/minuto
   - Latenza LLM
