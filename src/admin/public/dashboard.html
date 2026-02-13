@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — zerox.technology</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <script src="assets/app.js" defer></script>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>zerox.technology</h1>
+      <div class="nav">
+        <a href="dashboard.html" class="active">Dashboard</a>
+        <a href="settings.html">Impostazioni</a>
+        <a href="conversations.html">Conversazioni</a>
+        <a href="#" onclick="logout()">Esci</a>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="value" id="stat-messages-today">—</span>
+        <span class="label">Messaggi oggi</span>
+      </div>
+      <div class="stat-card">
+        <span class="value" id="stat-active-today">—</span>
+        <span class="label">Utenti attivi oggi</span>
+      </div>
+      <div class="stat-card">
+        <span class="value" id="stat-total-conversations">—</span>
+        <span class="label">Conversazioni totali</span>
+      </div>
+      <div class="stat-card">
+        <span class="value" id="stat-total-messages">—</span>
+        <span class="label">Messaggi totali</span>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:20px">
+      <h2>Stato Evolution API</h2>
+      <p>
+        <span class="status-dot disconnected" id="evolution-status"></span>
+        <span>Verifica in corso...</span>
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>Conversazioni recenti</h2>
+      <ul class="conv-list" id="recent-conversations">
+        <li style="padding:12px;color:var(--text-dim)">Caricamento...</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>document.addEventListener('DOMContentLoaded', loadDashboard);</script>
+</body>
+</html>

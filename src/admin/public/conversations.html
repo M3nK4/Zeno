@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conversazioni — zerox.technology</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <script src="assets/app.js" defer></script>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>zerox.technology</h1>
+      <div class="nav">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="settings.html">Impostazioni</a>
+        <a href="conversations.html" class="active">Conversazioni</a>
+        <a href="#" onclick="logout()">Esci</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Conversazioni</h2>
+
+      <div class="search-bar">
+        <input type="text" id="search-input" placeholder="Cerca nei messaggi..." onkeydown="if(event.key==='Enter')searchConversations()">
+        <button class="btn" onclick="searchConversations()">Cerca</button>
+        <button class="btn" onclick="document.getElementById('search-input').value='';loadConversations()">Reset</button>
+      </div>
+
+      <ul class="conv-list" id="conversation-list">
+        <li style="padding:12px;color:var(--text-dim)">Caricamento...</li>
+      </ul>
+
+      <div id="chat-view" style="display:none">
+        <div class="chat-header" style="margin-bottom:16px"></div>
+        <div class="chat-messages"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>document.addEventListener('DOMContentLoaded', loadConversations);</script>
+</body>
+</html>

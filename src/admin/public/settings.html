@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Impostazioni — zerox.technology</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <script src="assets/app.js" defer></script>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>zerox.technology</h1>
+      <div class="nav">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="settings.html" class="active">Impostazioni</a>
+        <a href="conversations.html">Conversazioni</a>
+        <a href="#" onclick="logout()">Esci</a>
+      </div>
+    </div>
+
+    <form onsubmit="saveSettings(event)">
+
+      <div class="card">
+        <h2>LLM Provider</h2>
+        <div class="form-group">
+          <label for="cfg-llm_provider">Provider</label>
+          <select id="cfg-llm_provider" onchange="updateModelOptions(this.value)">
+            <option value="claude">Claude (Anthropic)</option>
+            <option value="openai">OpenAI</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="cfg-llm_model">Modello</label>
+          <select id="cfg-llm_model">
+            <option value="claude-sonnet-4-5-20250514">Claude Sonnet 4.5</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="cfg-claude_api_key">API Key Claude</label>
+          <input type="password" id="cfg-claude_api_key" placeholder="sk-ant-...">
+        </div>
+        <div class="form-group">
+          <label for="cfg-openai_api_key">API Key OpenAI</label>
+          <input type="password" id="cfg-openai_api_key" placeholder="sk-...">
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>System Prompt</h2>
+        <div class="form-group">
+          <label for="cfg-system_prompt">Prompt di sistema</label>
+          <textarea id="cfg-system_prompt" rows="8" placeholder="Istruzioni per l'agente AI..."></textarea>
+        </div>
+        <div class="form-group">
+          <label for="cfg-max_history">Messaggi di contesto (storico)</label>
+          <input type="number" id="cfg-max_history" min="5" max="200" value="50">
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Handoff umano</h2>
+        <div class="form-group">
+          <label for="cfg-handoff_email">Email notifiche</label>
+          <input type="email" id="cfg-handoff_email" placeholder="team@zerox.technology">
+        </div>
+        <div class="form-group">
+          <label for="cfg-handoff_keywords">Parole chiave (separate da virgola)</label>
+          <input type="text" id="cfg-handoff_keywords" placeholder="parla con umano, operatore, assistenza umana">
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>SMTP (Email)</h2>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-group">
+            <label for="cfg-smtp_host">Host</label>
+            <input type="text" id="cfg-smtp_host" placeholder="smtp.gmail.com">
+          </div>
+          <div class="form-group">
+            <label for="cfg-smtp_port">Porta</label>
+            <input type="number" id="cfg-smtp_port" value="587">
+          </div>
+          <div class="form-group">
+            <label for="cfg-smtp_user">Username</label>
+            <input type="text" id="cfg-smtp_user" placeholder="user@gmail.com">
+          </div>
+          <div class="form-group">
+            <label for="cfg-smtp_pass">Password</label>
+            <input type="password" id="cfg-smtp_pass" placeholder="app password">
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width:100%;padding:14px;font-size:14px">
+        Salva impostazioni
+      </button>
+
+    </form>
+  </div>
+
+  <script>document.addEventListener('DOMContentLoaded', loadSettings);</script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+# WhatsApp AI Agent — zerox.technology
+
+Agente WhatsApp intelligente per zerox.technology. Risponde a messaggi di testo, vocali e immagini usando Claude o OpenAI, con memoria delle conversazioni e pannello admin web.
+
+## Requisiti
+
+- Node.js 18+
+- Docker + Docker Compose (per Evolution API)
+- Account WhatsApp (da collegare via QR code)
+- API key Claude e/o OpenAI
+
+## Quick Start
+
+```bash
+# 1. Clona il progetto
+git clone <repo-url>
+cd whatsapp-agent
+
+# 2. Installa dipendenze
+npm install
+
+# 3. Configura
+cp .env.example .env
+# Modifica .env con le tue credenziali
+
+# 4. Avvia Evolution API
+docker compose up -d
+
+# 5. Crea utente admin
+npm run create-admin
+
+# 6. Avvia il server
+npm run dev
+
+# 7. Apri il pannello admin
+# http://localhost:3000/admin
+```
+
+## Configurazione Evolution API
+
+1. Avvia con `docker compose up -d`
+2. Vai su `http://localhost:8080` (Evolution API Manager)
+3. Crea un'istanza con il nome configurato in `.env` (`EVOLUTION_INSTANCE`)
+4. Scansiona il QR code con WhatsApp
+5. Configura il webhook: `http://host:3000/webhook`
+
+## Comandi
+
+| Comando | Descrizione |
+|---------|-------------|
+| `npm run dev` | Avvia in modalità sviluppo (auto-reload) |
+| `npm start` | Avvia in produzione |
+| `npm run create-admin` | Crea/aggiorna utente admin |
+| `npm run create-admin <user> <pass>` | Crea con credenziali specifiche |
+
+## Pannello Admin
+
+Accessibile su `http://localhost:3000/admin`:
+
+- **Dashboard**: statistiche, stato Evolution API, conversazioni recenti
+- **Impostazioni**: provider LLM, API key, system prompt, handoff, SMTP
+- **Conversazioni**: storico completo, ricerca, vista chat
+
+## Funzionalita
+
+- Risponde a messaggi di testo con contesto conversazionale
+- Trascrive messaggi vocali (Whisper) e risponde
+- Analizza immagini (Vision API) e risponde
+- Handoff a umano con notifica email
+- Switch Claude / OpenAI senza restart
+- Pannello admin protetto da login
+
+## Licenza
+
+Proprietary — zerox.technology
