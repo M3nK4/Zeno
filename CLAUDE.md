@@ -2,6 +2,48 @@
 
 WhatsApp AI Agent per zerox.technology. Bot che risponde a messaggi di testo, vocali e immagini, con memoria conversazionale, handoff a umano, e pannello admin web.
 
+## Regole obbligatorie per Claude Code
+
+**QUESTE REGOLE SONO VINCOLANTI. Devono essere seguite SEMPRE, senza eccezioni.**
+
+### Prima di qualsiasi lavoro
+
+1. **LEGGERE SEMPRE** tutti i file di documentazione prima di iniziare:
+   - `CLAUDE.md` — istruzioni progetto, struttura, convenzioni
+   - `STATO-PROGETTO.md` — stato attuale del progetto
+   - `docs/README.md` — documentazione utente
+   - `docs/ARCHITECTURE.md` — architettura del sistema
+   - `docs/ADMIN-PANEL.md` — pannello admin e API
+   - `docs/DECISIONS.md` — decisioni e punti aperti
+   - `docs/SETUP-VPS.md` — guida deploy
+2. **LEGGERE SEMPRE** i file sorgente rilevanti prima di modificarli
+3. **LEGGERE SEMPRE** i file di memoria in `~/.claude/projects/*/memory/`
+
+### Dopo ogni modifica al codice
+
+1. **AGGIORNARE SEMPRE** la documentazione se la modifica cambia:
+   - Struttura file → `CLAUDE.md` (sezione struttura progetto)
+   - API endpoints → `docs/ADMIN-PANEL.md`
+   - Architettura → `docs/ARCHITECTURE.md`
+   - Comandi/script → `CLAUDE.md` e `docs/README.md`
+   - Decisioni → `docs/DECISIONS.md`
+   - Stato progetto → `STATO-PROGETTO.md`
+2. **AGGIORNARE SEMPRE** i file di memoria (`MEMORY.md`, `workflow.md`)
+3. **VERIFICARE SEMPRE** dopo ogni modifica:
+   - `npx tsc --noEmit` — 0 errori
+   - `npx vitest run` — tutti i test passano
+   - `npx eslint src/` — 0 errori
+
+### Strumenti da usare
+
+1. **Utilizzare le skill installate** in `.claude/skills/` come parte del workflow
+2. **Utilizzare Agent Teams** per task complessi — parallelizzare il lavoro con agenti specializzati
+3. **Ogni agente** deve usare almeno una skill pertinente al suo compito
+
+### Principio guida
+
+> La documentazione e il codice devono essere SEMPRE allineati. Se cambia uno, deve cambiare anche l'altro. Non esiste modifica "troppo piccola" per aggiornare i docs.
+
 ## Tech Stack
 
 - **Node.js 20** + **TypeScript** (eseguito con tsx, no build step)
@@ -93,6 +135,10 @@ whatsapp-agent/
 │
 ├── data/
 │   └── agent.db                # SQLite database (auto-creato)
+│
+├── .claude/
+│   ├── settings.json           # Permessi e configurazione Claude Code
+│   └── skills/                 # 15 skill per sicurezza, code quality, architettura, testing
 │
 ├── docs/                       # Documentazione
 ├── .github/workflows/ci.yml   # CI: type check + test

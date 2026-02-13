@@ -1,0 +1,14 @@
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(npm run dev)",
+      "Bash(npm start)",
+      "Bash(npm install*)",
+      "Bash(npx tsc*)",
+      "Bash(docker compose*)"
+    ]
+  }
+}
