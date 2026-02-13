@@ -4,8 +4,9 @@
 
 - URL: `http://<host>:3000/admin`
 - Login con username/password
-- Sessione JWT (24h), salvata in localStorage
+- Sessione JWT (24h): token in localStorage per API, cookie HttpOnly per pagine protette
 - Rate limit login: 5 tentativi per 15 minuti
+- Pagine protette verificate server-side via `pageAuthMiddleware` (cookie `admin_session`)
 
 ## Pagine
 
@@ -22,18 +23,12 @@
 
 | Campo | Descrizione |
 |-------|-------------|
-| Provider | Claude, OpenAI o Gemini (dropdown) |
-| Modello | Lista modelli del provider selezionato |
-| API Key Claude | Chiave Anthropic (mascherata) |
-| API Key OpenAI | Chiave OpenAI (mascherata) |
+| Modello | Lista modelli Gemini (2.5 Flash, 2.5 Flash Lite, 2.5 Pro, 3 Flash, 3 Pro) |
 | API Key Gemini | Chiave Google AI (mascherata) |
 | System Prompt | Textarea con le istruzioni per l'agente |
 | Max storico | Numero messaggi di contesto (5-200) |
-| Email handoff | Destinatario notifiche escalation |
-| Keyword handoff | Parole chiave separate da virgola |
-| SMTP | Host, porta, username, password |
 
-Le API key gia salvate appaiono mascherate. Vengono sovrascritte solo se il campo contiene un nuovo valore (i valori mascherati con `••••••••` vengono ignorati).
+Le API key gia salvate appaiono mascherate. Vengono sovrascritte solo se il campo contiene un nuovo valore (i valori mascherati con `--------` vengono ignorati).
 
 ### Conversazioni (`/admin/conversations.html`)
 - Lista conversazioni raggruppate per numero (con paginazione)
@@ -44,11 +39,12 @@ Le API key gia salvate appaiono mascherate. Vengono sovrascritte solo se il camp
 
 ## API REST
 
-Tutte le API sotto `/admin/api/` richiedono header `Authorization: Bearer <token>`, tranne `/login`.
+Tutte le API sotto `/admin/api/` richiedono header `Authorization: Bearer <token>`, tranne `/login` e `/logout`.
 
 | Metodo | Endpoint | Descrizione |
 |--------|----------|-------------|
-| POST | `/admin/api/login` | Login, ritorna JWT (rate limit: 5/15min) |
+| POST | `/admin/api/login` | Login, ritorna JWT + imposta cookie (rate limit: 5/15min) |
+| POST | `/admin/api/logout` | Logout, cancella cookie sessione |
 | GET | `/admin/api/stats` | Statistiche dashboard + stato Evolution |
 | GET | `/admin/api/settings` | Tutte le impostazioni (API key mascherate) |
 | POST | `/admin/api/settings` | Aggiorna impostazioni (solo chiavi consentite) |
@@ -99,6 +95,7 @@ Risposta paginata:
 
 - Password hashata con bcrypt (10 rounds)
 - JWT con scadenza 24h
+- Cookie HttpOnly `admin_session` per protezione pagine server-side (SameSite=strict)
 - API key mascherate nelle risposte GET
 - Valori mascherati non sovrascrivono quelli salvati
 - Rate limiting su login (5 tentativi / 15 minuti)

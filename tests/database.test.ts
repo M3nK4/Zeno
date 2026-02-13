@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import Database from 'better-sqlite3';
+import type { DbMessage } from '../src/types.js';
 
 // We create a fresh in-memory database per test and mock getDb to return it
 let testDb: Database.Database;
@@ -49,7 +50,7 @@ describe('Database - conversations', () => {
     it('saves a text message to the database', () => {
       saveMessage('393331234567', 'user', 'Ciao, come stai?');
 
-      const rows = testDb.prepare('SELECT * FROM messages').all() as any[];
+      const rows = testDb.prepare('SELECT * FROM messages').all() as DbMessage[];
       expect(rows).toHaveLength(1);
       expect(rows[0].phone).toBe('393331234567');
       expect(rows[0].role).toBe('user');
@@ -61,7 +62,7 @@ describe('Database - conversations', () => {
     it('saves a message with media type and url', () => {
       saveMessage('393331234567', 'user', 'Foto allegata', 'image', 'https://example.com/photo.jpg');
 
-      const rows = testDb.prepare('SELECT * FROM messages').all() as any[];
+      const rows = testDb.prepare('SELECT * FROM messages').all() as DbMessage[];
       expect(rows).toHaveLength(1);
       expect(rows[0].media_type).toBe('image');
       expect(rows[0].media_url).toBe('https://example.com/photo.jpg');
@@ -70,7 +71,7 @@ describe('Database - conversations', () => {
     it('saves an assistant message', () => {
       saveMessage('393331234567', 'assistant', 'Ciao! Tutto bene, grazie.');
 
-      const rows = testDb.prepare('SELECT * FROM messages').all() as any[];
+      const rows = testDb.prepare('SELECT * FROM messages').all() as DbMessage[];
       expect(rows).toHaveLength(1);
       expect(rows[0].role).toBe('assistant');
     });
@@ -78,7 +79,7 @@ describe('Database - conversations', () => {
     it('stores null for empty mediaType and mediaUrl', () => {
       saveMessage('393331234567', 'user', 'Test', '', '');
 
-      const rows = testDb.prepare('SELECT * FROM messages').all() as any[];
+      const rows = testDb.prepare('SELECT * FROM messages').all() as DbMessage[];
       expect(rows[0].media_type).toBeNull();
       expect(rows[0].media_url).toBeNull();
     });

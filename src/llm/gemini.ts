@@ -26,6 +26,13 @@ export async function callGemini(request: LlmRequest): Promise<string> {
 
     const lastMessage = request.messages[request.messages.length - 1];
 
+    logger.info({
+      model: request.model,
+      systemPrompt: request.systemPrompt ? request.systemPrompt.substring(0, 100) : '(empty)',
+      historyLength: history.length,
+      userMessage: lastMessage.content.substring(0, 80),
+    }, 'Calling Gemini API');
+
     const chat = ai.chats.create({
       model: request.model,
       history,
@@ -36,9 +43,13 @@ export async function callGemini(request: LlmRequest): Promise<string> {
 
     const response = await chat.sendMessage({ message: lastMessage.content });
 
+    logger.info({
+      responseLength: response.text?.length || 0,
+    }, 'Gemini API response received');
+
     return response.text || 'Non sono riuscito a generare una risposta.';
   } catch (err) {
-    logger.error({ err, provider: 'gemini', model: request.model }, 'Gemini API call failed');
+    logger.error({ err, model: request.model }, 'Gemini API call failed');
     throw new Error(`Gemini API error: ${err instanceof Error ? err.message : String(err)}`);
   }
 }

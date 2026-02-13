@@ -24,8 +24,10 @@ function requireAuth() {
 }
 
 function logout() {
-  clearToken();
-  window.location.href = '/admin/';
+  fetch('/admin/api/logout', { method: 'POST' }).finally(() => {
+    clearToken();
+    window.location.href = '/admin/';
+  });
 }
 
 // === API helpers ===
@@ -48,10 +50,6 @@ async function api(path, options = {}) {
 
 async function apiGet(path) {
   return api(path);
-}
-
-async function apiPost(path, body) {
-  return api(path, { method: 'POST', body: JSON.stringify(body) });
 }
 
 // === Toast ===
@@ -94,131 +92,6 @@ async function handleLogin(e) {
     }
   } catch (err) {
     showToast('Errore di connessione', true);
-  }
-}
-
-// === Dashboard ===
-
-async function loadDashboard() {
-  requireAuth();
-  const stats = await apiGet('/stats');
-  if (!stats) return;
-
-  document.getElementById('stat-messages-today').textContent = stats.messagesToday || 0;
-  document.getElementById('stat-active-today').textContent = stats.activeToday || 0;
-  document.getElementById('stat-total-conversations').textContent = stats.totalConversations || 0;
-  document.getElementById('stat-total-messages').textContent = stats.totalMessages || 0;
-
-  const statusDot = document.getElementById('evolution-status');
-  if (stats.evolutionConnected) {
-    statusDot.className = 'status-dot connected';
-    statusDot.nextElementSibling.textContent = 'Connesso';
-  } else {
-    statusDot.className = 'status-dot disconnected';
-    statusDot.nextElementSibling.textContent = 'Disconnesso';
-  }
-
-  // Load recent conversations
-  const response = await apiGet('/conversations?limit=5');
-  if (!response) return;
-  const convs = response.data || response;
-  const list = document.getElementById('recent-conversations');
-  list.innerHTML = '';
-  convs.forEach(c => {
-    const li = document.createElement('li');
-    li.className = 'conv-item';
-    li.onclick = () => window.location.href = `/admin/conversations.html?phone=${encodeURIComponent(c.phone)}`;
-    li.innerHTML = `
-      <div>
-        <div class="phone">+${escapeHtml(c.phone)}</div>
-        <div class="preview">${escapeHtml(c.lastMessage || '')}</div>
-      </div>
-      <div class="meta">
-        <span class="count">${escapeHtml(String(c.messageCount))}</span>
-        <div>${formatDate(c.lastTimestamp)}</div>
-      </div>
-    `;
-    list.appendChild(li);
-  });
-}
-
-// === Settings ===
-
-async function loadSettings() {
-  requireAuth();
-  const config = await apiGet('/settings');
-  if (!config) return;
-
-  // Fill form fields
-  for (const [key, value] of Object.entries(config)) {
-    const el = document.getElementById('cfg-' + key);
-    if (el) {
-      if (el.tagName === 'SELECT') {
-        el.value = value;
-      } else {
-        el.value = value;
-      }
-    }
-  }
-
-  // Update model dropdown based on provider
-  updateModelOptions(config.llm_provider);
-}
-
-function updateModelOptions(provider) {
-  const select = document.getElementById('cfg-llm_model');
-  if (!select) return;
-  const current = select.value;
-
-  const models = {
-    claude: [
-      { value: 'claude-sonnet-4-5-20250514', label: 'Claude Sonnet 4.5' },
-      { value: 'claude-haiku-4-5-20251001', label: 'Claude Haiku 4.5' },
-      { value: 'claude-opus-4-6', label: 'Claude Opus 4.6' },
-    ],
-    openai: [
-      { value: 'gpt-4o', label: 'GPT-4o' },
-      { value: 'gpt-4o-mini', label: 'GPT-4o Mini' },
-      { value: 'gpt-4-turbo', label: 'GPT-4 Turbo' },
-    ],
-    gemini: [
-      { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash' },
-      { value: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite' },
-      { value: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro' },
-      { value: 'gemini-3-flash-preview', label: 'Gemini 3 Flash (Preview)' },
-      { value: 'gemini-3-pro-preview', label: 'Gemini 3 Pro (Preview)' },
-    ],
-  };
-
-  select.innerHTML = '';
-  (models[provider] || []).forEach(m => {
-    const opt = document.createElement('option');
-    opt.value = m.value;
-    opt.textContent = m.label;
-    select.appendChild(opt);
-  });
-
-  // Try to restore previous value
-  if ([...select.options].some(o => o.value === current)) {
-    select.value = current;
-  }
-}
-
-async function saveSettings(e) {
-  e.preventDefault();
-  const form = e.target;
-  const data = {};
-  const fields = form.querySelectorAll('input, select, textarea');
-  fields.forEach(f => {
-    const key = f.id?.replace('cfg-', '');
-    if (key) data[key] = f.value;
-  });
-
-  const result = await apiPost('/settings', data);
-  if (result?.success) {
-    showToast('Impostazioni salvate');
-  } else {
-    showToast('Errore nel salvataggio', true);
   }
 }
 

@@ -47,7 +47,40 @@ export async function loginHandler(req: Request, res: Response): Promise<void> {
     expiresIn: '24h',
   });
 
+  // Set HttpOnly cookie for server-side page protection
+  const isProduction = process.env.NODE_ENV === 'production';
+  res.cookie('admin_session', token, {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: 'strict',
+    maxAge: 24 * 60 * 60 * 1000, // 24h
+    path: '/admin',
+  });
+
   res.json({ token, username: user.username });
+}
+
+/** Middleware to protect admin HTML pages via cookie */
+export function pageAuthMiddleware(req: Request, res: Response, next: NextFunction): void {
+  const token = req.cookies?.admin_session;
+  if (!token) {
+    res.redirect('/admin/');
+    return;
+  }
+
+  try {
+    jwt.verify(token, env.jwtSecret);
+    next();
+  } catch {
+    // Clear invalid cookie and redirect to login
+    res.clearCookie('admin_session', { path: '/admin' });
+    res.redirect('/admin/');
+  }
+}
+
+export function logoutHandler(_req: Request, res: Response): void {
+  res.clearCookie('admin_session', { path: '/admin' });
+  res.json({ success: true });
 }
 
 export function authMiddleware(req: Request, res: Response, next: NextFunction): void {

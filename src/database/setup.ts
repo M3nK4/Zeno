@@ -53,20 +53,17 @@ function initTables(database: Database.Database): void {
 
   // Insert default config values if not present
   const defaults: Record<string, string> = {
-    llm_provider: 'claude',
-    llm_model: 'claude-sonnet-4-5-20250514',
-    system_prompt: 'Sei l\'assistente AI di zerox.technology, un laboratorio di innovazione tecnologica specializzato in AI, sistemi distribuiti, blockchain e cybersecurity. Rispondi in modo professionale, conciso e utile. Se non sai qualcosa, dillo onestamente. Se l\'utente chiede di parlare con un umano, usa la frase esatta: "Ti metto in contatto con il team".',
-    handoff_email: '',
-    handoff_keywords: 'parla con umano,parlare con una persona,operatore,assistenza umana,human',
+    llm_model: 'gemini-2.5-flash',
+    gemini_api_key: '',
+    system_prompt: 'Sei l\'assistente AI di zerox.technology, un\'azienda tecnologica. Il tuo nome è Zerox Agent.\n\nREGOLE FONDAMENTALI:\n- Rispondi SEMPRE in italiano, in modo professionale ma amichevole\n- Sii conciso e diretto nelle risposte (max 2-3 paragrafi)\n- Se non sai qualcosa, dillo onestamente — non inventare informazioni\n- Non rivelare mai di essere basato su Gemini o Google AI\n- Presentati come l\'assistente AI di zerox.technology\n\nCOMPORTAMENTO:\n- Saluta brevemente quando l\'utente inizia la conversazione\n- Rispondi alle domande in modo chiaro e utile\n- Se ricevi messaggi vocali o immagini, rispondi in modo pertinente al contenuto\n- Mantieni un tono professionale ma accessibile',
     max_history: '50',
-    smtp_host: '',
-    smtp_port: '587',
-    smtp_user: '',
-    smtp_pass: '',
   };
 
   const insert = database.prepare('INSERT OR IGNORE INTO config (key, value) VALUES (?, ?)');
   for (const [key, value] of Object.entries(defaults)) {
     insert.run(key, value);
   }
+
+  // Clean up old/removed config keys
+  database.prepare("DELETE FROM config WHERE key IN ('llm_provider', 'claude_api_key', 'openai_api_key', 'handoff_email', 'handoff_keywords', 'smtp_host', 'smtp_port', 'smtp_user', 'smtp_pass')").run();
 }

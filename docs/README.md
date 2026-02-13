@@ -1,13 +1,13 @@
 # WhatsApp AI Agent — zerox.technology
 
-Agente WhatsApp intelligente per zerox.technology. Risponde a messaggi di testo, vocali e immagini usando Claude, OpenAI o Gemini, con memoria delle conversazioni e pannello admin web.
+Agente WhatsApp intelligente per zerox.technology. Risponde a messaggi di testo, vocali e immagini usando Google Gemini, con memoria delle conversazioni e pannello admin web.
 
 ## Requisiti
 
 - Node.js 20+ (vedi `.nvmrc`)
 - Docker + Docker Compose (per Evolution API)
 - Account WhatsApp (da collegare via QR code)
-- API key Claude, OpenAI e/o Gemini
+- API key Google Gemini
 
 ## Quick Start
 
@@ -48,7 +48,7 @@ npm run dev
 
 | Comando | Descrizione |
 |---------|-------------|
-| `npm run dev` | Avvia in modalità sviluppo (auto-reload) |
+| `npm run dev` | Avvia in modalita sviluppo (auto-reload) |
 | `npm start` | Avvia in produzione |
 | `npm run create-admin` | Crea/aggiorna utente admin |
 | `npm run create-admin -- <user> <pass>` | Crea con credenziali specifiche |
@@ -64,21 +64,21 @@ npm run dev
 Accessibile su `http://localhost:3000/admin`:
 
 - **Dashboard**: statistiche, stato Evolution API, conversazioni recenti
-- **Impostazioni**: provider LLM, API key, system prompt, handoff, SMTP
+- **Impostazioni**: API key Gemini, modello, system prompt
 - **Conversazioni**: storico completo con paginazione, ricerca full-text, vista chat
+
+Le pagine protette (dashboard, settings, conversations) richiedono un cookie di sessione valido. Il login imposta sia un JWT in localStorage (per le API) sia un cookie HttpOnly (per l'accesso alle pagine).
 
 ## Funzionalita
 
 - Risponde a messaggi di testo con contesto conversazionale
 - Trascrive messaggi vocali (Whisper) e risponde
-- Analizza immagini (Vision API) e risponde
-- Handoff a umano con notifica email
-- Switch Claude / OpenAI / Gemini senza restart
-- Pannello admin protetto da login
+- Analizza immagini (Gemini Vision) e risponde
+- Pannello admin protetto da login (JWT + cookie session)
 - **Security**: helmet headers, rate limiting, CORS, validazione input
 - **Health check**: `GET /health` per monitoraggio
 - **Logging strutturato**: pino con output formattato
-- **46 test automatizzati** con Vitest
+- **Test automatizzati** con Vitest
 
 ## Sicurezza
 
@@ -89,6 +89,7 @@ Accessibile su `http://localhost:3000/admin`:
 - Validazione input sul webhook (body, event, formato telefono)
 - API key mascherate nelle risposte admin
 - Password hashate con bcrypt (10 rounds)
+- Pagine admin protette server-side via cookie HttpOnly
 
 ## Licenza
 

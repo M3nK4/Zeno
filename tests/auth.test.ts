@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
@@ -72,7 +72,7 @@ describe('Auth - JWT tokens', () => {
       expect(token).toBeTruthy();
       expect(token.split('.')).toHaveLength(3); // JWT has 3 parts
 
-      const decoded = jwt.verify(token, SECRET) as any;
+      const decoded = jwt.verify(token, SECRET) as jwt.JwtPayload;
       expect(decoded.userId).toBe(1);
       expect(decoded.username).toBe('admin');
     });
@@ -96,7 +96,7 @@ describe('Auth - JWT tokens', () => {
       const payload = { userId: 1, username: 'admin' };
       const token = jwt.sign(payload, SECRET, { expiresIn: '24h' });
 
-      const decoded = jwt.verify(token, SECRET) as any;
+      const decoded = jwt.verify(token, SECRET) as jwt.JwtPayload;
       expect(decoded.exp).toBeDefined();
       expect(decoded.iat).toBeDefined();
       // Expiry should be roughly 24h from now

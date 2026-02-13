@@ -2,11 +2,13 @@ import express from 'express';
 import path from 'path';
 import helmet from 'helmet';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
 import { env, validateConfig } from './config.js';
 import { getDb, closeDb } from './database/setup.js';
 import { webhookHandler } from './webhook/handler.js';
 import { adminRoutes } from './admin/routes.js';
+import { pageAuthMiddleware, logoutHandler } from './admin/auth.js';
 import { logger } from './logger.js';
 
 // Validate security-critical config before starting
@@ -47,15 +49,16 @@ app.use(rateLimit({
   message: { error: 'Troppe richieste, riprova più tardi' },
 }));
 
-// Parse JSON bodies
+// Parse JSON bodies and cookies
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // Initialize database
 getDb();
 logger.info('Database initialized');
 
-// Webhook endpoint with dedicated rate limit: 60 req/min per IP
+// Webhook endpoint with dedicated rate limit and API key auth
 const webhookLimiter = rateLimit({
   windowMs: 60 * 1000,
   max: 60,
@@ -63,7 +66,17 @@ const webhookLimiter = rateLimit({
   legacyHeaders: false,
   message: { error: 'Webhook rate limit exceeded' },
 });
-app.post('/webhook', webhookLimiter, webhookHandler);
+app.post('/webhook', webhookLimiter, (req, res, next) => {
+  // Verify Evolution API key if configured
+  if (env.evolutionApiKey) {
+    const apiKey = req.headers['apikey'] as string | undefined;
+    if (apiKey !== env.evolutionApiKey) {
+      res.status(401).json({ error: 'Invalid API key' });
+      return;
+    }
+  }
+  next();
+}, webhookHandler);
 
 // Health check
 app.get('/health', (_req, res) => {
@@ -80,8 +93,35 @@ const loginLimiter = rateLimit({
 });
 app.post('/admin/api/login', loginLimiter);
 
-// Admin panel static files
-app.use('/admin', express.static(path.join(__dirname, 'admin/public')));
+// Admin panel: public assets (CSS, JS) — no auth needed
+const noCacheHeaders = (_res: express.Response) => {
+  _res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+  _res.setHeader('Pragma', 'no-cache');
+};
+app.use('/admin/assets', express.static(path.join(__dirname, 'admin/public/assets'), {
+  etag: false, lastModified: false, setHeaders: noCacheHeaders,
+}));
+
+// Admin login page — public
+app.get('/admin/', (_req, res) => {
+  noCacheHeaders(res);
+  res.sendFile(path.join(__dirname, 'admin/public/index.html'));
+});
+app.get('/admin/index.html', (_req, res) => {
+  res.redirect('/admin/');
+});
+
+// Admin protected pages — require valid session cookie
+const protectedPages = ['dashboard.html', 'settings.html', 'conversations.html'];
+for (const page of protectedPages) {
+  app.get(`/admin/${page}`, pageAuthMiddleware, (_req, res) => {
+    noCacheHeaders(res);
+    res.sendFile(path.join(__dirname, `admin/public/${page}`));
+  });
+}
+
+// Admin logout (clears cookie)
+app.post('/admin/api/logout', logoutHandler);
 
 // Admin API routes
 app.use('/admin/api', adminRoutes);

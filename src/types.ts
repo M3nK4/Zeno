@@ -2,15 +2,12 @@
 
 // --- LLM Types ---
 
-export type LlmProvider = 'claude' | 'openai' | 'gemini';
-
 export interface LlmMessage {
   readonly role: 'user' | 'assistant';
   readonly content: string;
 }
 
 export interface LlmRequest {
-  readonly provider: string;
   readonly model: string;
   readonly apiKey: string;
   readonly systemPrompt: string;
@@ -92,29 +89,4 @@ export interface EvolutionWebhookBody {
 export interface EvolutionInstanceStatus {
   readonly connected: boolean;
   readonly name: string;
-}
-
-// --- SMTP Types ---
-
-export interface SmtpConfig {
-  readonly host: string;
-  readonly port: number;
-  readonly user: string;
-  readonly pass: string;
-  readonly from: string;
-}
-
-// --- Supported image MIME types for Claude Vision ---
-
-export const SUPPORTED_IMAGE_TYPES = [
-  'image/jpeg',
-  'image/png',
-  'image/gif',
-  'image/webp',
-] as const;
-
-export type SupportedImageType = typeof SUPPORTED_IMAGE_TYPES[number];
-
-export function isSupportedImageType(mime: string): mime is SupportedImageType {
-  return (SUPPORTED_IMAGE_TYPES as readonly string[]).includes(mime);
 }

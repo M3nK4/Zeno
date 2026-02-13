@@ -5,19 +5,11 @@ export const env = {
   port: parseInt(process.env.PORT || '3000', 10),
   jwtSecret: process.env.JWT_SECRET || 'change-me',
 
-  evolutionApiUrl: process.env.EVOLUTION_API_URL || 'http://localhost:8080',
+  evolutionApiUrl: process.env.EVOLUTION_API_URL || 'http://localhost:8081',
   evolutionApiKey: process.env.EVOLUTION_API_KEY || '',
   evolutionInstance: process.env.EVOLUTION_INSTANCE || 'zerox',
 
-  claudeApiKey: process.env.CLAUDE_API_KEY || '',
-  openaiApiKey: process.env.OPENAI_API_KEY || '',
   geminiApiKey: process.env.GEMINI_API_KEY || '',
-
-  smtpHost: process.env.SMTP_HOST || '',
-  smtpPort: parseInt(process.env.SMTP_PORT || '587', 10),
-  smtpUser: process.env.SMTP_USER || '',
-  smtpPass: process.env.SMTP_PASS || '',
-  smtpFrom: process.env.SMTP_FROM || 'noreply@zerox.technology',
 
   adminUsername: process.env.ADMIN_USERNAME || 'admin',
   adminPassword: process.env.ADMIN_PASSWORD || 'change-me',
@@ -39,7 +31,6 @@ export function validateConfig(): void {
   }
 
   if (!env.evolutionApiKey) {
-    // Use process.stderr directly — logger may not be initialized yet
     process.stderr.write('[WARN] EVOLUTION_API_KEY is not set — webhook requests will not be authenticated\n');
   }
 

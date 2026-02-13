@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-store">
   <title>Impostazioni — zerox.technology</title>
-  <link rel="stylesheet" href="assets/style.css">
-  <script src="assets/app.js" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=2">
 </head>
 <body>
   <div class="container">
@@ -15,39 +15,36 @@
         <a href="dashboard.html">Dashboard</a>
         <a href="settings.html" class="active">Impostazioni</a>
         <a href="conversations.html">Conversazioni</a>
-        <a href="#" onclick="logout()">Esci</a>
+        <a href="#" onclick="fetch('/admin/api/logout',{method:'POST'}).finally(function(){localStorage.removeItem('admin_token');window.location.href='/admin/'})">Esci</a>
       </div>
     </div>
 
-    <form onsubmit="saveSettings(event)">
+    <form id="settings-form">
 
       <div class="card">
-        <h2>LLM Provider</h2>
+        <h2>Google Gemini</h2>
         <div class="form-group">
-          <label for="cfg-llm_provider">Provider</label>
-          <select id="cfg-llm_provider" onchange="updateModelOptions(this.value)">
-            <option value="claude">Claude (Anthropic)</option>
-            <option value="openai">OpenAI</option>
-            <option value="gemini">Gemini (Google)</option>
-          </select>
+          <label>API Key</label>
+          <div id="api-key-status" style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg);border-radius:6px;border:1px solid var(--border)">
+            <span id="api-key-indicator" style="font-size:14px">Caricamento...</span>
+          </div>
+          <div id="api-key-edit" style="display:none;margin-top:8px">
+            <div style="display:flex;gap:8px">
+              <input type="text" id="cfg-gemini_api_key_new" placeholder="Incolla la nuova API Key (AIza...)" style="flex:1">
+              <button type="button" onclick="confirmNewKey()" style="padding:8px 16px;background:#00ff99;color:#0a0a0a;border:none;border-radius:6px;cursor:pointer;font-weight:bold">Salva</button>
+              <button type="button" onclick="cancelEditKey()" style="padding:8px 16px;background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:6px;cursor:pointer">Annulla</button>
+            </div>
+          </div>
         </div>
         <div class="form-group">
           <label for="cfg-llm_model">Modello</label>
           <select id="cfg-llm_model">
-            <option value="claude-sonnet-4-5-20250514">Claude Sonnet 4.5</option>
+            <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+            <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite</option>
+            <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
+            <option value="gemini-3-flash-preview">Gemini 3 Flash (Preview)</option>
+            <option value="gemini-3-pro-preview">Gemini 3 Pro (Preview)</option>
           </select>
-        </div>
-        <div class="form-group">
-          <label for="cfg-claude_api_key">API Key Claude</label>
-          <input type="password" id="cfg-claude_api_key" placeholder="sk-ant-...">
-        </div>
-        <div class="form-group">
-          <label for="cfg-openai_api_key">API Key OpenAI</label>
-          <input type="password" id="cfg-openai_api_key" placeholder="sk-...">
-        </div>
-        <div class="form-group">
-          <label for="cfg-gemini_api_key">API Key Gemini (Google)</label>
-          <input type="password" id="cfg-gemini_api_key" placeholder="AIza...">
         </div>
       </div>
 
@@ -55,45 +52,11 @@
         <h2>System Prompt</h2>
         <div class="form-group">
           <label for="cfg-system_prompt">Prompt di sistema</label>
-          <textarea id="cfg-system_prompt" rows="8" placeholder="Istruzioni per l'agente AI..."></textarea>
+          <textarea id="cfg-system_prompt" rows="14" placeholder="Istruzioni per l'agente AI..."></textarea>
         </div>
         <div class="form-group">
           <label for="cfg-max_history">Messaggi di contesto (storico)</label>
           <input type="number" id="cfg-max_history" min="5" max="200" value="50">
-        </div>
-      </div>
-
-      <div class="card">
-        <h2>Handoff umano</h2>
-        <div class="form-group">
-          <label for="cfg-handoff_email">Email notifiche</label>
-          <input type="email" id="cfg-handoff_email" placeholder="team@zerox.technology">
-        </div>
-        <div class="form-group">
-          <label for="cfg-handoff_keywords">Parole chiave (separate da virgola)</label>
-          <input type="text" id="cfg-handoff_keywords" placeholder="parla con umano, operatore, assistenza umana">
-        </div>
-      </div>
-
-      <div class="card">
-        <h2>SMTP (Email)</h2>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-          <div class="form-group">
-            <label for="cfg-smtp_host">Host</label>
-            <input type="text" id="cfg-smtp_host" placeholder="smtp.gmail.com">
-          </div>
-          <div class="form-group">
-            <label for="cfg-smtp_port">Porta</label>
-            <input type="number" id="cfg-smtp_port" value="587">
-          </div>
-          <div class="form-group">
-            <label for="cfg-smtp_user">Username</label>
-            <input type="text" id="cfg-smtp_user" placeholder="user@gmail.com">
-          </div>
-          <div class="form-group">
-            <label for="cfg-smtp_pass">Password</label>
-            <input type="password" id="cfg-smtp_pass" placeholder="app password">
-          </div>
         </div>
       </div>
 
@@ -104,6 +67,128 @@
     </form>
   </div>
 
-  <script>document.addEventListener('DOMContentLoaded', loadSettings);</script>
+  <script>
+    var _token = localStorage.getItem('admin_token');
+    if (!_token) window.location.href = '/admin/';
+
+    var _headers = { 'Authorization': 'Bearer ' + _token, 'Content-Type': 'application/json' };
+    var _currentKeyMasked = '';
+
+    function showToast(msg, isErr) {
+      var t = document.getElementById('toast');
+      if (!t) { t = document.createElement('div'); t.id = 'toast'; t.className = 'toast'; document.body.appendChild(t); }
+      t.textContent = msg;
+      t.className = 'toast' + (isErr ? ' error' : '');
+      requestAnimationFrame(function() { t.classList.add('show'); });
+      setTimeout(function() { t.classList.remove('show'); }, 3000);
+    }
+
+    function renderKeyStatus() {
+      var el = document.getElementById('api-key-indicator');
+      if (_currentKeyMasked && _currentKeyMasked !== '••••••••') {
+        el.innerHTML = '<span style="color:#00ff99;font-weight:bold">&#10003; Configurata</span>' +
+          ' <span style="color:var(--text-dim);font-size:12px">(' + _currentKeyMasked + ')</span>' +
+          ' <button type="button" onclick="startEditKey()" style="margin-left:8px;padding:4px 10px;background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:4px;cursor:pointer;font-size:12px">Cambia</button>' +
+          ' <button type="button" onclick="deleteKey()" style="padding:4px 10px;background:#ff4444;color:white;border:none;border-radius:4px;cursor:pointer;font-size:12px">Elimina</button>';
+      } else {
+        el.innerHTML = '<span style="color:#ff4444;font-weight:bold">&#10007; Non configurata</span>' +
+          ' <button type="button" onclick="startEditKey()" style="margin-left:8px;padding:4px 10px;background:#00ff99;color:#0a0a0a;border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:bold">Aggiungi</button>';
+      }
+    }
+
+    function startEditKey() {
+      document.getElementById('api-key-edit').style.display = 'block';
+      document.getElementById('cfg-gemini_api_key_new').focus();
+    }
+
+    function cancelEditKey() {
+      document.getElementById('api-key-edit').style.display = 'none';
+      document.getElementById('cfg-gemini_api_key_new').value = '';
+    }
+
+    async function confirmNewKey() {
+      var newKey = document.getElementById('cfg-gemini_api_key_new').value.trim();
+      if (!newKey) { showToast('Inserisci una API key', true); return; }
+      if (!newKey.startsWith('AIza')) { showToast('La API key deve iniziare con AIza...', true); return; }
+
+      var res = await fetch('/admin/api/settings', {
+        method: 'POST', headers: _headers,
+        body: JSON.stringify({ gemini_api_key: newKey })
+      });
+      var data = await res.json();
+      if (data.success) {
+        _currentKeyMasked = newKey.substring(0, 8) + '••••••••';
+        renderKeyStatus();
+        cancelEditKey();
+        showToast('API Key salvata');
+      } else {
+        showToast('Errore nel salvataggio', true);
+      }
+    }
+
+    async function deleteKey() {
+      if (!confirm('Sei sicuro di voler eliminare la API Key? Il bot smetterà di funzionare.')) return;
+
+      var res = await fetch('/admin/api/settings', {
+        method: 'POST', headers: _headers,
+        body: JSON.stringify({ gemini_api_key: '' })
+      });
+      var data = await res.json();
+      if (data.success) {
+        _currentKeyMasked = '';
+        renderKeyStatus();
+        showToast('API Key eliminata');
+      }
+    }
+
+    async function loadSettingsInline() {
+      try {
+        var res = await fetch('/admin/api/settings', { headers: _headers });
+        if (res.status === 401) {
+          localStorage.removeItem('admin_token');
+          window.location.href = '/admin/';
+          return;
+        }
+        var config = await res.json();
+
+        // API key status
+        _currentKeyMasked = config.gemini_api_key || '';
+        renderKeyStatus();
+
+        // Fill other fields
+        var fields = ['llm_model', 'system_prompt', 'max_history'];
+        fields.forEach(function(key) {
+          var el = document.getElementById('cfg-' + key);
+          if (el && config[key] !== undefined) el.value = config[key];
+        });
+      } catch (err) {
+        showToast('Errore nel caricamento: ' + err.message, true);
+      }
+    }
+
+    document.getElementById('settings-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      var data = {};
+      var fields = this.querySelectorAll('input, select, textarea');
+      fields.forEach(function(f) {
+        var key = f.id ? f.id.replace('cfg-', '') : '';
+        if (key && key !== 'gemini_api_key_new') data[key] = f.value;
+      });
+
+      try {
+        var res = await fetch('/admin/api/settings', {
+          method: 'POST', headers: _headers,
+          body: JSON.stringify(data)
+        });
+        var result = await res.json();
+        if (result.success) showToast('Impostazioni salvate');
+        else showToast('Errore nel salvataggio', true);
+      } catch (err) {
+        showToast('Errore: ' + err.message, true);
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', loadSettingsInline);
+  </script>
 </body>
 </html>

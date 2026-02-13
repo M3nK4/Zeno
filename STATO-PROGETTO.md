@@ -5,53 +5,50 @@
 
 ## Stato: Completo
 
-Il progetto è completo e funzionante. TypeScript compila senza errori, 46 test passano, 0 errori ESLint.
+Il progetto e completo e funzionante. LLM: Google Gemini (unico provider). Auth: JWT + cookie session per pagine admin.
 
 ### Fase 1: Implementazione base (completata)
 - Server Express con webhook, pannello admin, LLM integration
 - Database SQLite con WAL mode
-- Supporto testo, vocale (Whisper), immagini (Vision API)
-- Handoff a umano con notifica email
-- Switch Claude/OpenAI/Gemini senza restart
+- Supporto testo, vocale (Whisper), immagini (Gemini Vision)
 
 ### Fase 2: Configurazione Claude Code (completata)
 - `CLAUDE.md` con istruzioni progetto
 - `.claude/settings.json` con permessi
-- `.claude/skills/` con 15 skill installate
+- `.claude/skills/` con skill installate
 
 ### Fase 3: Skills installate (completata)
-15 skill in 4 categorie: sicurezza (6), code quality (4), architettura (3), LLM/testing (2).
+Skill in 4 categorie: sicurezza, code quality, architettura, LLM/testing.
 
 ### Fase 4: Miglioramento con Agent Teams + pulizia (completata)
-4 agent teams hanno lavorato in parallelo usando le skill:
+Agent teams hanno lavorato in parallelo:
 
 1. **Security hardening**: helmet, rate limiting, CORS, validazione input, validateConfig()
 2. **Code quality**: types.ts, logger.ts (pino), singleton LLM client, error handling, indici DB
-3. **Testing**: Vitest, 44 test (database 17, auth 11, handoff 9, LLM router 7)
+3. **Testing**: Vitest, test (database, auth, LLM router)
 4. **DevOps**: paginazione API, health check, GitHub Actions CI, ESLint + Prettier
-5. **Gemini**: src/llm/gemini.ts, router, image vision, admin panel UI, 2 nuovi test
 
 Pulizia aggiuntiva:
 - Logging consistente con pino (no console.log nel codice applicativo)
 - Graceful shutdown (SIGTERM/SIGINT) con chiusura DB
 - ESLint 0 errori, Prettier configurato
 - Documentazione aggiornata e coerente
-- Dead code rimosso (interfacce e alias inutilizzati)
 
-### Fase 5: Google Gemini Support (completata)
-- Aggiunto `@google/genai` SDK (nuovo SDK ufficiale Google, v1.41+)
-- Nuovo file `src/llm/gemini.ts` con singleton client pattern
-- Router LLM aggiornato con routing a Gemini
-- Supporto Gemini Vision per descrizione immagini (`ai.models.generateContent`)
-- Pannello admin aggiornato con provider Gemini e campo API key
-- Modelli disponibili: Gemini 2.5 Flash, 2.5 Flash Lite, 2.5 Pro, 3 Flash (Preview), 3 Pro (Preview)
-- 2 nuovi test per Gemini (routing + error propagation)
-- Helmet CSP configurato per permettere inline scripts nel pannello admin
-- Skill `.claude/skills/gemini-integration/` con documentazione SDK
+### Fase 5: Consolidamento Gemini + pulizia provider (completata)
+- Rimossi provider Claude (Anthropic SDK) e OpenAI SDK
+- Rimossi `@anthropic-ai/sdk` e `openai` dalle dipendenze
+- Rimossa `nodemailer` e funzionalita handoff/SMTP
+- Rimossa directory `src/handoff/`
+- Rimossi file `src/llm/claude.ts` e `src/llm/openai.ts`
+- Router LLM semplificato: instrada direttamente a Gemini
+- Settings semplificato: solo API key Gemini
+- Aggiunta auth cookie-based per pagine admin (`pageAuthMiddleware`)
+- Aggiunta dipendenza `cookie-parser`
+- Aggiunto endpoint logout (`/admin/api/logout`)
 
 ## Verifiche
 - `npx tsc --noEmit` — 0 errori
-- `npx vitest run` — 46/46 test passati
+- `npx vitest run` — test passati
 - `npx eslint src/` — 0 errori
 
 ## Prossimi passi possibili

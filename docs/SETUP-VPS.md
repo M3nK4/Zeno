@@ -56,10 +56,9 @@ Compila **obbligatoriamente**:
 - `JWT_SECRET`: stringa casuale lunga almeno 32 caratteri (es. `openssl rand -hex 32`)
 - `EVOLUTION_API_KEY`: chiave per Evolution API
 - `EVOLUTION_INSTANCE`: nome istanza (es. `zerox`)
-- `CLAUDE_API_KEY` e/o `OPENAI_API_KEY` e/o `GEMINI_API_KEY`: chiavi LLM
+- `GEMINI_API_KEY`: chiave API Google Gemini
 
 Opzionali:
-- `SMTP_*`: configurazione email per notifiche handoff
 - `CORS_ORIGIN`: origini consentite (default: `*`)
 
 **IMPORTANTE**: `JWT_SECRET` deve essere una stringa unica e forte. Il server non si avvia se usa il valore di default.
@@ -165,7 +164,7 @@ sudo certbot --nginx -d agent.zerox.technology
 1. Controlla il health check: `curl http://localhost:3000/health`
 2. Apri `http://<ip-vps>:3000/admin` (o il dominio HTTPS)
 3. Login con le credenziali create
-4. Configura LLM e system prompt dalle impostazioni
+4. Configura API key Gemini e system prompt dalle impostazioni
 5. Invia un messaggio WhatsApp al numero collegato
 6. Verifica che l'agente risponda
 
@@ -187,6 +186,5 @@ pm2 restart whatsapp-agent  # o: sudo systemctl restart whatsapp-agent
 | Evolution API non parte | `docker compose logs evolution-api` |
 | QR code non appare | Verifica che la porta 8081 sia accessibile |
 | Bot non risponde | Controlla che il webhook sia configurato in Evolution API |
-| Email handoff non arriva | Verifica config SMTP nelle impostazioni admin |
-| Errore API key | Controlla che la chiave sia inserita nelle impostazioni o nel `.env` |
+| Errore API key | Controlla che la chiave Gemini sia inserita nelle impostazioni o nel `.env` |
 | Rate limit raggiunto | Attendi il reset (1 min globale, 15 min login) |

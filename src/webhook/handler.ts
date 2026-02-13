@@ -5,7 +5,6 @@ import { sendText, downloadMedia } from '../evolution/client.js';
 import { routeLlm } from '../llm/router.js';
 import { transcribeAudio } from '../media/voice.js';
 import { describeImage } from '../media/image.js';
-import { checkHandoff } from '../handoff/notify.js';
 import { logger } from '../logger.js';
 
 export async function webhookHandler(req: Request, res: Response): Promise<void> {
@@ -87,14 +86,10 @@ export async function webhookHandler(req: Request, res: Response): Promise<void>
 
     if (!userText.trim()) return;
 
-    // Check for handoff keywords
-    const handoffTriggered = await checkHandoff(phone, userText);
-    if (handoffTriggered) {
-      saveMessage(phone, 'user', userText, mediaType, mediaUrl);
-      const handoffReply = 'Ti metto in contatto con il team, verrai ricontattato al più presto.';
-      saveMessage(phone, 'assistant', handoffReply);
-      await sendText(phone, handoffReply);
-      return;
+    // Limit text length to prevent abuse and excessive API costs
+    const MAX_TEXT_LENGTH = 10000;
+    if (userText.length > MAX_TEXT_LENGTH) {
+      userText = userText.substring(0, MAX_TEXT_LENGTH);
     }
 
     // Get conversation history
@@ -102,13 +97,12 @@ export async function webhookHandler(req: Request, res: Response): Promise<void>
     const history = getHistory(phone, maxHistory);
 
     // Get LLM config
-    const provider = getConfig('llm_provider') || 'claude';
-    const model = getConfig('llm_model') || 'claude-sonnet-4-5-20250514';
+    const model = getConfig('llm_model') || 'gemini-2.5-flash';
     const systemPrompt = getConfig('system_prompt') || '';
-    const apiKey = getApiKey(provider);
+    const apiKey = getApiKey();
 
     if (!apiKey) {
-      logger.error({ provider }, 'No API key configured');
+      logger.error('No Gemini API key configured');
       await sendText(phone, 'Il servizio non è al momento configurato. Riprova più tardi.');
       return;
     }
@@ -120,9 +114,8 @@ export async function webhookHandler(req: Request, res: Response): Promise<void>
     }));
     llmMessages.push({ role: 'user', content: userText });
 
-    // Call LLM
+    // Call Gemini
     const response = await routeLlm({
-      provider,
       model,
       apiKey,
       systemPrompt,

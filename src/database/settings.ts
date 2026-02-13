@@ -1,6 +1,5 @@
 import { getDb } from './setup.js';
 import { env } from '../config.js';
-import type { SmtpConfig } from '../types.js';
 
 interface ConfigRow {
   readonly value: string;
@@ -32,27 +31,7 @@ export function getAllConfig(): Record<string, string> {
   return config;
 }
 
-/** Get the API key for a provider, checking DB first, then .env fallback */
-export function getApiKey(provider: string): string {
-  if (provider === 'claude') {
-    return getConfig('claude_api_key') || env.claudeApiKey;
-  }
-  if (provider === 'openai') {
-    return getConfig('openai_api_key') || env.openaiApiKey;
-  }
-  if (provider === 'gemini') {
-    return getConfig('gemini_api_key') || env.geminiApiKey;
-  }
-  return '';
-}
-
-/** Get SMTP config, DB values take priority over .env */
-export function getSmtpConfig(): SmtpConfig {
-  return {
-    host: getConfig('smtp_host') || env.smtpHost,
-    port: parseInt(getConfig('smtp_port') || String(env.smtpPort), 10),
-    user: getConfig('smtp_user') || env.smtpUser,
-    pass: getConfig('smtp_pass') || env.smtpPass,
-    from: env.smtpFrom,
-  };
+/** Get the Gemini API key, checking DB first, then .env fallback */
+export function getApiKey(): string {
+  return getConfig('gemini_api_key') || env.geminiApiKey;
 }

@@ -3,16 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-store">
   <title>Dashboard — zerox.technology</title>
-  <link rel="stylesheet" href="assets/style.css">
-  <script src="assets/app.js" defer></script>
+  <link rel="stylesheet" href="assets/style.css?v=2">
+  <script src="assets/app.js?v=2" defer></script>
 </head>
 <body>
   <div class="container">
     <div class="header">
       <h1>zerox.technology</h1>
       <div class="nav">
-        <a href="dashboard.html" class="active">Dashboard</a>
+        <a href="dashboard.html">Dashboard</a>
         <a href="settings.html">Impostazioni</a>
         <a href="conversations.html">Conversazioni</a>
         <a href="#" onclick="logout()">Esci</a>
@@ -42,7 +43,7 @@
       <h2>Stato Evolution API</h2>
       <p>
         <span class="status-dot disconnected" id="evolution-status"></span>
-        <span>Verifica in corso...</span>
+        <span id="evolution-text">Verifica in corso...</span>
       </p>
     </div>
 
@@ -54,6 +55,63 @@
     </div>
   </div>
 
-  <script>document.addEventListener('DOMContentLoaded', loadDashboard);</script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async function() {
+      var token = localStorage.getItem('admin_token');
+      if (!token) {
+        document.getElementById('evolution-text').textContent = 'Non autenticato';
+        return;
+      }
+
+      var headers = { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' };
+
+      try {
+        var res = await fetch('/admin/api/stats', { headers: headers });
+
+        if (res.status === 401) {
+          document.getElementById('evolution-text').textContent = 'Token scaduto — fai login';
+          localStorage.removeItem('admin_token');
+          return;
+        }
+
+        var stats = await res.json();
+
+        document.getElementById('stat-messages-today').textContent = stats.messagesToday || 0;
+        document.getElementById('stat-active-today').textContent = stats.activeToday || 0;
+        document.getElementById('stat-total-conversations').textContent = stats.totalConversations || 0;
+        document.getElementById('stat-total-messages').textContent = stats.totalMessages || 0;
+
+        var dot = document.getElementById('evolution-status');
+        var txt = document.getElementById('evolution-text');
+        if (stats.evolutionConnected) {
+          dot.className = 'status-dot connected';
+          txt.textContent = 'Connesso';
+        } else {
+          dot.className = 'status-dot disconnected';
+          txt.textContent = 'Disconnesso';
+        }
+
+        var convRes = await fetch('/admin/api/conversations?limit=5', { headers: headers });
+        var convData = await convRes.json();
+        var convs = convData.data || convData;
+
+        var list = document.getElementById('recent-conversations');
+        list.innerHTML = '';
+        if (!Array.isArray(convs) || convs.length === 0) {
+          list.innerHTML = '<li style="padding:12px;color:var(--text-dim)">Nessuna conversazione</li>';
+        } else {
+          convs.forEach(function(c) {
+            var li = document.createElement('li');
+            li.className = 'conv-item';
+            li.innerHTML = '<div><div class="phone">+' + escapeHtml(c.phone) + '</div><div class="preview">' + escapeHtml(c.lastMessage || '') + '</div></div><div class="meta"><span class="count">' + escapeHtml(String(c.messageCount)) + '</span></div>';
+            list.appendChild(li);
+          });
+        }
+
+      } catch(err) {
+        document.getElementById('evolution-text').textContent = 'Errore: ' + err.message;
+      }
+    });
+  </script>
 </body>
 </html>
