@@ -39,14 +39,15 @@ Pulizia aggiuntiva:
 - Dead code rimosso (interfacce e alias inutilizzati)
 
 ### Fase 5: Google Gemini Support (completata)
-- Aggiunto `@google/generative-ai` SDK
+- Aggiunto `@google/genai` SDK (nuovo SDK ufficiale Google, v1.41+)
 - Nuovo file `src/llm/gemini.ts` con singleton client pattern
 - Router LLM aggiornato con routing a Gemini
-- Supporto Gemini Vision per descrizione immagini
+- Supporto Gemini Vision per descrizione immagini (`ai.models.generateContent`)
 - Pannello admin aggiornato con provider Gemini e campo API key
-- Modelli disponibili: Gemini 2.0 Flash, 2.0 Flash Lite, 1.5 Pro, 1.5 Flash
+- Modelli disponibili: Gemini 2.5 Flash, 2.5 Flash Lite, 2.5 Pro, 3 Flash (Preview), 3 Pro (Preview)
 - 2 nuovi test per Gemini (routing + error propagation)
 - Helmet CSP configurato per permettere inline scripts nel pannello admin
+- Skill `.claude/skills/gemini-integration/` con documentazione SDK
 
 ## Verifiche
 - `npx tsc --noEmit` — 0 errori

@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.30",
-    "@google/generative-ai": "^0.24.1",
+    "@google/genai": "^1.41.0",
     "axios": "^1",
     "bcrypt": "^5",
     "better-sqlite3": "^11",

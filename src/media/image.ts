@@ -1,6 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 import OpenAI from 'openai';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenAI } from '@google/genai';
 import { getApiKey, getConfig } from '../database/settings.js';
 import { logger } from '../logger.js';
 import { isSupportedImageType } from '../types.js';
@@ -59,16 +59,18 @@ async function describeWithGemini(imageBuffer: Buffer, mimeType: string): Promis
   if (!apiKey) throw new Error('Gemini API key required for image description');
 
   try {
-    const client = new GoogleGenerativeAI(apiKey);
-    const model = client.getGenerativeModel({ model: getConfig('llm_model') || 'gemini-2.0-flash' });
+    const ai = new GoogleGenAI({ apiKey });
     const base64 = imageBuffer.toString('base64');
 
-    const result = await model.generateContent([
-      { inlineData: { mimeType, data: base64 } },
-      { text: 'Descrivi brevemente questa immagine in italiano, in una o due frasi.' },
-    ]);
+    const response = await ai.models.generateContent({
+      model: getConfig('llm_model') || 'gemini-2.5-flash',
+      contents: [
+        { inlineData: { mimeType, data: base64 } },
+        { text: 'Descrivi brevemente questa immagine in italiano, in una o due frasi.' },
+      ],
+    });
 
-    return result.response.text() || 'Immagine non descrivibile';
+    return response.text || 'Immagine non descrivibile';
   } catch (err) {
     logger.error({ err, provider: 'gemini' }, 'Image description failed');
     throw new Error(`Gemini Vision error: ${err instanceof Error ? err.message : String(err)}`);

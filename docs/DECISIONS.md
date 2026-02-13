@@ -37,8 +37,8 @@ Scelte architetturali e punti aperti per lo sviluppo e il deploy.
 - Compatibile con PM2, Docker e systemd
 
 ### Google Gemini Support (implementato)
-- Terzo provider LLM: Google Gemini via `@google/generative-ai`
-- Modelli supportati: Gemini 2.0 Flash, 2.0 Flash Lite, 1.5 Pro, 1.5 Flash
+- Terzo provider LLM: Google Gemini via `@google/genai` SDK (nuovo SDK ufficiale)
+- Modelli supportati: Gemini 2.5 Flash, 2.5 Flash Lite, 2.5 Pro, 3 Flash (Preview), 3 Pro (Preview)
 - Singleton client pattern (come Claude e OpenAI)
 - Supporto Vision per descrizione immagini con `inlineData`
 - Pannello admin aggiornato con dropdown Gemini e campo API key

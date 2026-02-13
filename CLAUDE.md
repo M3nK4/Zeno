@@ -49,7 +49,7 @@ WhatsApp AI Agent per zerox.technology. Bot che risponde a messaggi di testo, vo
 - **Node.js 20** + **TypeScript** (eseguito con tsx, no build step)
 - **Express 4** — web server con helmet, CORS, rate limiting
 - **better-sqlite3** — database locale (WAL mode, indici su phone+timestamp)
-- **@anthropic-ai/sdk** + **openai** + **@google/generative-ai** — 3 provider LLM switchabili (singleton client)
+- **@anthropic-ai/sdk** + **openai** + **@google/genai** — 3 provider LLM switchabili (singleton client)
 - **Evolution API** — bridge WhatsApp (Docker)
 - **nodemailer** — notifiche email SMTP
 - **bcrypt** + **jsonwebtoken** — auth pannello admin

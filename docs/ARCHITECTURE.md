@@ -109,7 +109,7 @@ SQLite locale (`data/agent.db`), creato automaticamente al primo avvio.
 - **Runtime**: Node.js 20 + TypeScript strict (eseguito con tsx)
 - **Web framework**: Express 4 + helmet + cors + express-rate-limit
 - **Database**: better-sqlite3 (WAL mode, foreign keys, indici)
-- **LLM**: @anthropic-ai/sdk, openai, @google/generative-ai (singleton client per provider)
+- **LLM**: @anthropic-ai/sdk, openai, @google/genai (singleton client per provider)
 - **Auth**: bcrypt (10 rounds) + jsonwebtoken (24h)
 - **Email**: nodemailer
 - **HTTP client**: axios (30s timeout)
