@@ -40,8 +40,8 @@ npm --version
 
 ```bash
 cd /opt
-git clone <repo-url> whatsapp-agent
-cd whatsapp-agent
+git clone <repo-url> zeno
+cd zeno
 npm install
 ```
 
@@ -97,7 +97,7 @@ npm run create-admin -- mio-user mia-password
 sudo npm install -g pm2
 
 # Avvia
-pm2 start npm --name "whatsapp-agent" -- start
+pm2 start npm --name "zeno" -- start
 
 # Auto-restart al reboot
 pm2 startup
@@ -107,15 +107,15 @@ pm2 save
 ### Opzione B: con systemd
 
 ```bash
-sudo tee /etc/systemd/system/whatsapp-agent.service << 'EOF'
+sudo tee /etc/systemd/system/zeno.service << 'EOF'
 [Unit]
-Description=WhatsApp AI Agent — zerox.technology
+Description=Zeno — zerox.technology
 After=network.target
 
 [Service]
 Type=simple
 User=root
-WorkingDirectory=/opt/whatsapp-agent
+WorkingDirectory=/opt/zeno
 ExecStart=/usr/bin/npm start
 Restart=on-failure
 RestartSec=10
@@ -125,8 +125,8 @@ WantedBy=multi-user.target
 EOF
 
 sudo systemctl daemon-reload
-sudo systemctl enable whatsapp-agent
-sudo systemctl start whatsapp-agent
+sudo systemctl enable zeno
+sudo systemctl start zeno
 ```
 
 ## 10. (Opzionale) HTTPS con nginx
@@ -135,7 +135,7 @@ sudo systemctl start whatsapp-agent
 sudo apt install -y nginx certbot python3-certbot-nginx
 
 # Configura nginx
-sudo tee /etc/nginx/sites-available/whatsapp-agent << 'EOF'
+sudo tee /etc/nginx/sites-available/zeno << 'EOF'
 server {
     listen 80;
     server_name agent.zerox.technology;
@@ -152,7 +152,7 @@ server {
 }
 EOF
 
-sudo ln -s /etc/nginx/sites-available/whatsapp-agent /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/zeno /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl reload nginx
 
 # SSL
@@ -171,11 +171,11 @@ sudo certbot --nginx -d agent.zerox.technology
 ## Aggiornamento
 
 ```bash
-cd /opt/whatsapp-agent
+cd /opt/zeno
 git pull
 npm install
 npm test                  # Verifica che i test passino
-pm2 restart whatsapp-agent  # o: sudo systemctl restart whatsapp-agent
+pm2 restart zeno  # o: sudo systemctl restart zeno
 ```
 
 ## Troubleshooting

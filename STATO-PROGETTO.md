@@ -1,7 +1,7 @@
-# WhatsApp Agent — Stato Progetto
+# Zeno — Stato Progetto
 
-## Posizione
-`C:\Users\Alessio\Desktop\whatsapp-agent\`
+## Repository
+https://github.com/M3nK4/Zeno.git
 
 ## Stato: Completo
 

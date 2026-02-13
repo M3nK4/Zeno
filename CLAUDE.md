@@ -1,6 +1,6 @@
-# whatsapp-agent — zerox.technology
+# Zeno — zerox.technology
 
-WhatsApp AI Agent per zerox.technology. Bot che risponde a messaggi di testo, vocali e immagini, con memoria conversazionale e pannello admin web. LLM: Google Gemini.
+AI Agent WhatsApp per zerox.technology. Bot che risponde a messaggi di testo, vocali e immagini, con memoria conversazionale e pannello admin web. LLM: Google Gemini.
 
 ## Regole obbligatorie per Claude Code
 
@@ -83,7 +83,7 @@ docker compose up -d   # Avvia Evolution API + PostgreSQL
 ## Struttura progetto
 
 ```
-whatsapp-agent/
+Zeno/
 ├── src/
 │   ├── server.ts               # Express: helmet, CORS, rate limiting, cookie-parser, routes
 │   ├── config.ts               # Env loader + validateConfig() per sicurezza

@@ -128,7 +128,7 @@ app.use('/admin/api', adminRoutes);
 
 // Start server
 const server = app.listen(env.port, () => {
-  logger.info({ port: env.port }, 'WhatsApp Agent server running');
+  logger.info({ port: env.port }, 'Zeno server running');
   logger.info({ url: `http://localhost:${env.port}/admin` }, 'Admin panel');
   logger.info({ url: `http://localhost:${env.port}/webhook` }, 'Webhook URL');
 });

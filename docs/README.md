@@ -1,4 +1,4 @@
-# WhatsApp AI Agent — zerox.technology
+# Zeno — zerox.technology
 
 Agente WhatsApp intelligente per zerox.technology. Risponde a messaggi di testo, vocali e immagini usando Google Gemini, con memoria delle conversazioni e pannello admin web.
 
@@ -14,7 +14,7 @@ Agente WhatsApp intelligente per zerox.technology. Risponde a messaggi di testo,
 ```bash
 # 1. Clona il progetto
 git clone <repo-url>
-cd whatsapp-agent
+cd zeno
 
 # 2. Installa dipendenze
 npm install

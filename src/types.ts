@@ -1,4 +1,4 @@
-// Shared type definitions for whatsapp-agent
+// Shared type definitions for Zeno
 
 // --- LLM Types ---
 
