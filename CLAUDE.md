@@ -98,7 +98,7 @@ whatsapp-agent/
 │   │   └── gemini.ts           # Google Gemini SDK: singleton client, error handling
 │   │
 │   ├── media/
-│   │   ├── voice.ts            # Audio → Whisper API → testo (con error handling)
+│   │   ├── voice.ts            # Audio → Gemini → trascrizione testo
 │   │   └── image.ts            # Immagine → Gemini Vision → descrizione
 │   │
 │   ├── database/
@@ -160,7 +160,7 @@ whatsapp-agent/
 ### Flusso messaggio
 1. Evolution API → POST `/webhook` (rate limit: 60/min per IP)
 2. handler.ts: valida body e campi, estrai tipo (testo/vocale/immagine) e contenuto
-3. Se vocale → Whisper, se immagine → Gemini Vision
+3. Se vocale → Gemini trascrizione, se immagine → Gemini Vision
 4. Recupera storico da SQLite
 5. Chiama Gemini (singleton client)
 6. Salva in DB, rispondi via Evolution API
@@ -170,8 +170,10 @@ whatsapp-agent/
 - Rate limiting: globale (100/min), webhook (60/min), login (5/15min)
 - CORS configurabile via `CORS_ORIGIN`
 - Validazione `JWT_SECRET` all'avvio (blocca se insicuro)
-- Input validation sul webhook (body, event, formato telefono)
+- Webhook autenticato con header `apikey` di Evolution API
+- Input validation sul webhook (body, event, formato telefono, max 10.000 caratteri)
 - API key mascherate nelle risposte admin
+- Cookie `secure` flag attivo in produzione (NODE_ENV=production)
 
 ### Pannello Admin
 - Login con JWT (24h): token in localStorage per API, cookie HttpOnly per pagine
