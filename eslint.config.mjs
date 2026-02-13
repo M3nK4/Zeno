@@ -7,6 +7,6 @@ export default tseslint.config(
   ...tseslint.configs.strict,
   prettierConfig,
   {
-    ignores: ['dist/', 'node_modules/', 'data/'],
+    ignores: ['dist/', 'node_modules/', 'data/', 'src/admin/public/**'],
   },
 );

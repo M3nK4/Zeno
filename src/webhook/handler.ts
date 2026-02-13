@@ -6,7 +6,7 @@ import { routeLlm } from '../llm/router.js';
 import { transcribeAudio } from '../media/voice.js';
 import { describeImage } from '../media/image.js';
 import { checkHandoff } from '../handoff/notify.js';
-import type { LlmProvider } from '../types.js';
+import { logger } from '../logger.js';
 
 export async function webhookHandler(req: Request, res: Response): Promise<void> {
   // Validate webhook body structure before processing
@@ -63,7 +63,7 @@ export async function webhookHandler(req: Request, res: Response): Promise<void>
         const audioBuffer = await downloadMedia(key.id);
         userText = await transcribeAudio(audioBuffer);
       } catch (err) {
-        console.error('Voice transcription failed:', err);
+        logger.error({ err, phone }, 'Voice transcription failed');
         await sendText(phone, 'Non sono riuscito a trascrivere il messaggio vocale. Puoi riprovare o scrivermi in testo?');
         return;
       }
@@ -77,7 +77,7 @@ export async function webhookHandler(req: Request, res: Response): Promise<void>
           ? `[L'utente ha inviato un'immagine: ${description}] Messaggio: ${caption}`
           : `[L'utente ha inviato un'immagine: ${description}]`;
       } catch (err) {
-        console.error('Image description failed:', err);
+        logger.error({ err, phone }, 'Image description failed');
         userText = caption || "[L'utente ha inviato un'immagine che non sono riuscito ad analizzare]";
       }
     } else {
@@ -102,13 +102,13 @@ export async function webhookHandler(req: Request, res: Response): Promise<void>
     const history = getHistory(phone, maxHistory);
 
     // Get LLM config
-    const provider = (getConfig('llm_provider') || 'claude') as LlmProvider;
+    const provider = getConfig('llm_provider') || 'claude';
     const model = getConfig('llm_model') || 'claude-sonnet-4-5-20250514';
     const systemPrompt = getConfig('system_prompt') || '';
     const apiKey = getApiKey(provider);
 
     if (!apiKey) {
-      console.error(`No API key configured for provider: ${provider}`);
+      logger.error({ provider }, 'No API key configured');
       await sendText(phone, 'Il servizio non è al momento configurato. Riprova più tardi.');
       return;
     }
@@ -136,6 +136,6 @@ export async function webhookHandler(req: Request, res: Response): Promise<void>
     // Send reply via WhatsApp
     await sendText(phone, response);
   } catch (err) {
-    console.error('Webhook handler error:', err);
+    logger.error({ err }, 'Webhook handler error');
   }
 }

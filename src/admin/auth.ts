@@ -6,6 +6,17 @@ import { env } from '../config.js';
 
 const SALT_ROUNDS = 10;
 
+interface AdminUser {
+  readonly id: number;
+  readonly username: string;
+  readonly password_hash: string;
+}
+
+interface JwtPayload {
+  readonly userId: number;
+  readonly username: string;
+}
+
 export async function createAdminUser(username: string, password: string): Promise<void> {
   const db = getDb();
   const hash = await bcrypt.hash(password, SALT_ROUNDS);
@@ -20,7 +31,7 @@ export async function loginHandler(req: Request, res: Response): Promise<void> {
   }
 
   const db = getDb();
-  const user = db.prepare('SELECT * FROM admin_users WHERE username = ?').get(username) as any;
+  const user = db.prepare('SELECT * FROM admin_users WHERE username = ?').get(username) as AdminUser | undefined;
   if (!user) {
     res.status(401).json({ error: 'Credenziali non valide' });
     return;
@@ -48,8 +59,8 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction):
 
   const token = authHeader.slice(7);
   try {
-    const payload = jwt.verify(token, env.jwtSecret);
-    (req as any).user = payload;
+    const payload = jwt.verify(token, env.jwtSecret) as JwtPayload;
+    (req as Request & { user: JwtPayload }).user = payload;
     next();
   } catch {
     res.status(401).json({ error: 'Token non valido o scaduto' });

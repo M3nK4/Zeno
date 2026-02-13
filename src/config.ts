@@ -38,13 +38,14 @@ export function validateConfig(): void {
   }
 
   if (!env.evolutionApiKey) {
-    console.warn('[WARN] EVOLUTION_API_KEY is not set — webhook requests will not be authenticated');
+    // Use process.stderr directly — logger may not be initialized yet
+    process.stderr.write('[WARN] EVOLUTION_API_KEY is not set — webhook requests will not be authenticated\n');
   }
 
   if (errors.length > 0) {
-    console.error('\n=== SECURITY CONFIGURATION ERRORS ===');
-    errors.forEach(e => console.error(`  - ${e}`));
-    console.error('=====================================\n');
+    process.stderr.write('\n=== SECURITY CONFIGURATION ERRORS ===\n');
+    errors.forEach(e => process.stderr.write(`  - ${e}\n`));
+    process.stderr.write('=====================================\n\n');
     process.exit(1);
   }
 }

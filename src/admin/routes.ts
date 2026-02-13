@@ -25,7 +25,7 @@ adminRoutes.get('/stats', async (_req, res) => {
     const stats = getStats();
     const evolution = await getInstanceStatus();
     res.json({ ...stats, evolutionConnected: evolution.connected });
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: 'Errore nel recupero statistiche' });
   }
 });
@@ -42,7 +42,7 @@ adminRoutes.get('/settings', (_req, res) => {
       }
     }
     res.json(masked);
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: 'Errore nel recupero impostazioni' });
   }
 });
@@ -64,7 +64,7 @@ adminRoutes.post('/settings', (req, res) => {
       }
     }
     res.json({ success: true });
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: 'Errore nel salvataggio impostazioni' });
   }
 });
@@ -75,7 +75,7 @@ adminRoutes.get('/conversations', (req, res) => {
     const { page, limit } = parsePagination(req.query);
     const result = listConversationsPaginated(page, limit);
     res.json(result);
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: 'Errore nel recupero conversazioni' });
   }
 });
@@ -84,7 +84,7 @@ adminRoutes.get('/conversations/:phone', (req, res) => {
   try {
     const messages = getConversation(req.params.phone);
     res.json(messages);
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: 'Errore nel recupero conversazione' });
   }
 });
@@ -100,7 +100,7 @@ adminRoutes.get('/search', (req, res) => {
     const { page, limit } = parsePagination(req.query);
     const results = searchMessagesPaginated(query, page, limit);
     res.json(results);
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: 'Errore nella ricerca' });
   }
 });
@@ -133,7 +133,7 @@ adminRoutes.get('/health', async (_req, res) => {
         },
       },
     });
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: 'Errore nel health check' });
   }
 });

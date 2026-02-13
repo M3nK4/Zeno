@@ -4,9 +4,10 @@ import helmet from 'helmet';
 import cors from 'cors';
 import rateLimit from 'express-rate-limit';
 import { env, validateConfig } from './config.js';
-import { getDb } from './database/setup.js';
+import { getDb, closeDb } from './database/setup.js';
 import { webhookHandler } from './webhook/handler.js';
 import { adminRoutes } from './admin/routes.js';
+import { logger } from './logger.js';
 
 // Validate security-critical config before starting
 validateConfig();
@@ -38,7 +39,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Initialize database
 getDb();
-console.log('Database initialized');
+logger.info('Database initialized');
 
 // Webhook endpoint with dedicated rate limit: 60 req/min per IP
 const webhookLimiter = rateLimit({
@@ -72,8 +73,23 @@ app.use('/admin', express.static(path.join(__dirname, 'admin/public')));
 app.use('/admin/api', adminRoutes);
 
 // Start server
-app.listen(env.port, () => {
-  console.log(`WhatsApp Agent server running on port ${env.port}`);
-  console.log(`Admin panel: http://localhost:${env.port}/admin`);
-  console.log(`Webhook URL: http://localhost:${env.port}/webhook`);
+const server = app.listen(env.port, () => {
+  logger.info({ port: env.port }, 'WhatsApp Agent server running');
+  logger.info({ url: `http://localhost:${env.port}/admin` }, 'Admin panel');
+  logger.info({ url: `http://localhost:${env.port}/webhook` }, 'Webhook URL');
 });
+
+// Graceful shutdown
+function shutdown(signal: string) {
+  logger.info({ signal }, 'Shutdown signal received, closing server...');
+  server.close(() => {
+    closeDb();
+    logger.info('Server closed');
+    process.exit(0);
+  });
+  // Force exit after 10s if graceful shutdown fails
+  setTimeout(() => process.exit(1), 10000);
+}
+
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));
